@@ -1,0 +1,37 @@
+﻿@using StatybuWeb.Dto;
+@model List<Picture>
+
+<div class="main-gallery">
+
+    @foreach (var picture in Model)
+    {
+        <div class="gallery-cell">
+            <img src="@picture.PictureUri?.AbsoluteUri.ToString()" alt="Image">
+        </div>
+    }
+</div>
+
+@using (Html.BeginForm("UploadImage", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="form-group">
+        <label for="file">Select file:</label>
+        <input type="file" id="file" name="file" class="form-control-file" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Upload</button>
+}
+<script src="/js/flickity.pkgd.min.js"></script>
+
+<!-- Initialize the carousel -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var flkty = new Flickity('.main-gallery', {
+            wrapAround: true
+            // Configure Flickity options here
+        });
+    });
+</script>
+
+
+<!-- Include Flickity CSS -->
+<link rel="stylesheet" href="/css/flickity.min.css">

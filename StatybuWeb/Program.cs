@@ -1,10 +1,13 @@
+using StatybuWeb.Services.Api;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddTransient<IAzureService, AzureService>();
+builder.Services.AddTransient<IAzureBlobStorageService, AzureBlobStorageService>();
+builder.Services.AddTransient<IAzureKeyVaultService, AzureKeyVaultService>();
 var app = builder.Build();
-
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
