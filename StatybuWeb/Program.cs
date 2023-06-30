@@ -1,3 +1,4 @@
+using Auth0.AspNetCore.Authentication;
 using StatybuWeb.Services.Api;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,15 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IAzureService, AzureService>();
 builder.Services.AddTransient<IAzureBlobStorageService, AzureBlobStorageService>();
 builder.Services.AddTransient<IAzureKeyVaultService, AzureKeyVaultService>();
+
+
+// Add Auth0 Auth, reading the app settings above
+builder.Services.AddAuth0WebAppAuthentication(options =>
+{
+    options.Domain = builder.Configuration["Auth0:Domain"];
+    options.ClientId = builder.Configuration["Auth0:ClientId"];
+});
+
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -22,6 +32,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapControllerRoute(
     name: "default",

@@ -1,5 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Auth0.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StatybuWeb.Services.Api;
+using System.Security.Claims;
 
 namespace StatybuWeb.Controllers
 {
@@ -12,11 +17,14 @@ namespace StatybuWeb.Controllers
             _azureService = azureService;
             _azureBlobStorageService = azureBlobStorageService;
         }
+
+        [Authorize(AuthenticationSchemes = "Auth0")]
         public async Task<ActionResult> Index()
         {
             return View(await _azureBlobStorageService.GetImagesFilesFromBlobStorage());
         }
 
+        [Authorize(AuthenticationSchemes = "Auth0")]
         [HttpPost]
         public async Task<ActionResult> UploadImage(IFormFile file)
         {
@@ -27,6 +35,5 @@ namespace StatybuWeb.Controllers
 
             return RedirectToAction("Index");
         }
-
     }
 }

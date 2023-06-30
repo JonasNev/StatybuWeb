@@ -1,8 +1,167 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jonas Nevinskas - .NET C#, Sitecore, Azure Solution Developer</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Jonas Nevinskas</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#technologies">Technologies</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#certificates">Certificates</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+    <header class="bg-primary text-white text-center py-5">
+        <div class="container">
+            <h1 class="display-4">Welcome to my Technology Showcase!</h1>
+            <p class="lead">.NET C#, Sitecore, Azure Solution Developer</p>
+        </div>
+    </header>
+
+    <section id="about" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">About Me</h2>
+            <p>
+                Hello! I'm Jonas Nevinskas, a passionate .NET C#, Sitecore, and Azure Solution Developer based in Vilnius, Lithuania. With several years of experience in these technologies, I am dedicated to delivering high-quality solutions and exploring the latest innovations in the field.
+            </p>
+            <p>
+                Throughout my career, I have worked on various projects, leveraging the power of .NET C# to build robust applications and using Sitecore CMS to create dynamic and personalized websites. Additionally, my expertise in Azure allows me to design and implement scalable cloud-based solutions for a wide range of business needs.
+            </p>
+        </div>
+    </section>
+
+    <section id="technologies" class="bg-light py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Technologies I Work With</h2>
+            <div class="text-center row">
+                <div class="text-center col-lg-4 col-md-6 mb-4">
+                    <div class="card">
+                        <img src="~/images/csharpimage.png" class="mx-auto card-img-top" alt=".NET C#">
+                        <div class="card-body">
+                            <h5 class="card-title">.NET C#</h5>
+                            <p class="card-text">I have a strong command of .NET C# and its frameworks, enabling me to develop efficient and scalable web applications.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card">
+                        <img src="~/images/sitecore-logo.png" class="mx-auto card-img-top" alt="Sitecore">
+                        <div class="card-body">
+                            <h5 class="card-title">Sitecore</h5>
+                            <p class="card-text">As a Sitecore expert, I leverage its features to build personalized and content-rich websites that deliver exceptional user experiences.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card">
+                        <img src="~/images/ms-azure-hi-res.jpg" class="mx-auto card-img-top" alt="Azure">
+                        <div class="card-body">
+                            <h5 class="card-title">Azure Solution Development</h5>
+                            <p class="card-text">With Azure, I design and implement cloud-based solutions, leveraging its services to ensure scalability, security, and performance.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="certificates" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Certificates</h2>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card">
+                        <img src="~/images/azure-administrator-associate-600x600.png" class="mx-auto card-img-top" alt="Certificate Image">
+                        <div class="card-body">
+                            <h5 class="card-title">Microsoft az-104</h5>
+                            <p class="card-text">This certificate validates expertise in implementing, managing, and monitoring Microsoft Azure environments, covering virtual networks, storage, compute, identity, security, and governance. It also demonstrates the ability to collaborate with teams and deliver Azure solutions for networking, security, database, application development, and DevOps.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card">
+                        <img src="~/images/exam-az400-600x600.png" class="mx-auto card-img-top" alt="Certificate Image">
+                        <div class="card-body">
+                            <h5 class="card-title">Microsoft az-400</h5>
+                            <p class="card-text">A certified DevOps engineer possesses expertise in enabling continuous value delivery through collaboration, code, infrastructure, security, and monitoring. They excel in working within cross-functional teams, including developers, site reliability engineers, and Azure administrators, with experience in Azure administration and development, and proficiency in Azure DevOps and GitHub.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card">
+                        <img src="~/images/CERT-Expert-DevOps-Engineer-600x600.png" class="mx-auto card-img-top" alt="Certificate Image">
+                        <div class="card-body">
+                            <h5 class="card-title">Microsoft DevOps Engineer Expert</h5>
+                            <p class="card-text">This certificate is earned after successfully passing both the AZ-104 and AZ-400 certifications.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card">
+                        <img src="~/images/Sitetecore 10.jpg" class="mx-auto card-img-top" alt="Certificate Image">
+                        <div class="card-body">
+                            <h5 class="card-title">Sitecore .NET Developer 10</h5>
+                            <p class="card-text">This certification is earned by developers who demonstrate their mastery of building and implementing solutions on the Sitecore Experience Platform.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card">
+                        <img src="~/images/Sitecore CDP.jpg" class="mx-auto card-img-top" alt="Certificate Image">
+                        <div class="card-body">
+                            <h5 class="card-title">Sitecore CDP and Personalize</h5>
+                            <p class="card-text">Having the Sitecore CDP and Personalize Developer certification demonstrates the individual's proficiency in utilizing web technologies, REST APIs, JSON, JavaScript, A/B testing, personalization, segmentation, and data transformation within the Sitecore platform. They possess the necessary skills and knowledge to effectively implement and optimize personalized customer experiences using Sitecore's CDP and Personalize features.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section id="contact" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Contact Me</h2>
+            <p>If you have any inquiries or would like to discuss potential collaborations, feel free to reach out to me:</p>
+            <ul>
+                <li>Email: <a href="mailto:j.nevinskas@gmail.com">j.nevinskas@gmail.com</a></li>
+                <li>LinkedIn: <a href="https://www.linkedin.com/in/jonas-nevinskas-99493a165/">https://www.linkedin.com/in/jonas-nevinskas-99493a165/</a></li>
+            </ul>
+            <p>I'm based in Vilnius, Lithuania, and I look forward to connecting with you!</p>
+        </div>
+    </section>
+
+    <footer class="bg-dark text-white py-3">
+        <div class="container text-center">
+            <p>&copy; 2023 Jonas Nevinskas. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js" integrity="sha512-nnzkI2u2Dy6HMnzMIkh7CPd1KX445z38XIu4jG1jGw7x5tSL3VBjE44dY4ihMU1ijAQV930SPM12cCFrB18sVw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
