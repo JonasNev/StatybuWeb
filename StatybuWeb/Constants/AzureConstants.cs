@@ -7,6 +7,9 @@
         {
             public const string ConnectionString = "ConnectionString";
             public const string BlobContainer = "PictureBlobStorageContainerName";
+            public const string Auth0ClientSecret = "Auth0ClientSecret";
+            public const string Auth0ClientId = "Auth0ClientId";
+            public const string Auth0Domain = "Auth0Domain";
         }
     }
 }
