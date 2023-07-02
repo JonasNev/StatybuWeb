@@ -20,7 +20,7 @@ namespace StatybuWeb.Services.Api
                 BlobClient blobClient = containerClient.GetBlobClient(blobItem.Name);
                 imageUris.Add(new Picture()
                 {
-                    PictureUri = blobClient.Uri
+                    Uri = blobClient.Uri
                 });
             }
 
@@ -79,7 +79,8 @@ namespace StatybuWeb.Services.Api
                 string blobUrl = blobClient.Uri.ToString();
                 return new Picture()
                 {
-                    PictureUri = blobClient.Uri
+                    Uri = blobClient.Uri,
+                    Name = blobClient.Name
                 };
             }
             catch (Exception ex)

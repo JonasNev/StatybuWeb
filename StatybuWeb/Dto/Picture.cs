@@ -2,6 +2,7 @@
 {
     public class Picture
     {
-        public Uri? PictureUri { get; set; }
+        public Uri? Uri { get; set; }
+        public string? Name { get; set; }
     }
 }

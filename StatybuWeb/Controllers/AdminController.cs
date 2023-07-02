@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Mvc;
 using StatybuWeb.Services.Api;
 using System.Security.Claims;
@@ -33,6 +34,28 @@ namespace StatybuWeb.Controllers
                 await _azureBlobStorageService.UploadFileToBlobStorage(file);
             }
 
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> DeleteImages(List<string> fileNames)
+        {
+            BlobContainerClient containerClient = await _azureBlobStorageService.GetAzureBlobContainerClientFromSecrets();
+            foreach (string name in fileNames)
+            {
+                try
+                {
+                    // Get a reference to the file
+                    BlobClient blobClient = containerClient.GetBlobClient(name);
+
+                    // Delete the file
+                    await blobClient.DeleteAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error deleting file': {ex.Message}");
+                }
+            }
             return RedirectToAction("Index");
         }
     }
