@@ -6,8 +6,6 @@
     var nameList = new List<string>();
 }
 
-@using (Html.BeginForm("DeleteImages", "Admin", FormMethod.Post))
-{
     <div class="main-gallery">
         @foreach (var picture in Model)
         {
@@ -17,12 +15,6 @@
             </div>
         }
     </div>
-
-    <div class="form-group">
-        <button type="submit"name="submit" value="submit" class="btn btn-primary">Delete Selected Images</button>
-    </div>
-
-    <input type="hidden" name="nameList" value="" />
 }
 
 @using (Html.BeginForm("UploadImage", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -44,30 +36,6 @@
             // Configure Flickity options here
         });
     });
-
-    const toggleCheckbox = document.getElementById("toggleCheckbox");
-    const imageCheckboxes = document.getElementsByClassName("imageCheckbox");
-
-    toggleCheckbox.addEventListener("change", function () {
-        const showImageSelection = toggleCheckbox.checked;
-        for (let i = 0; i < imageCheckboxes.length; i++) {
-            imageCheckboxes[i].style.display = showImageSelection ? "block" : "none";
-        }
-    });
-
-    function updateNameList(checkbox) {
-        var value = checkbox.value;
-        var nameListInput = document.querySelector('input[name="nameList"]');
-        if (checkbox.checked) {
-            nameList.push(value);
-        } else {
-            var index = nameList.indexOf(value);
-            if (index !== -1) {
-                nameList.splice(index, 1);
-            }
-        }
-        nameListInput.value = nameList.join(",");
-    }
 </script>
 
 
