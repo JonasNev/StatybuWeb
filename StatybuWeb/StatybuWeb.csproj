@@ -15,6 +15,7 @@
     <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.2.2" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.2.2" />
     <PackageReference Include="Microsoft.Owin.Security.OpenIdConnect" Version="4.2.2" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
   </ItemGroup>
 
 </Project>

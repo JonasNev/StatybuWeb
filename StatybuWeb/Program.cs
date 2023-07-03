@@ -5,7 +5,10 @@ using Microsoft.VisualBasic;
 using StatybuWeb.Services.Api;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+});
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IAzureService, AzureService>();
@@ -26,6 +29,7 @@ builder.Services.AddAuth0WebAppAuthentication(options =>
 });
 
 var app = builder.Build();
+app.UseResponseCompression();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

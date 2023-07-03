@@ -1,6 +1,7 @@
 ﻿using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Azure.Storage.Blobs;
+using SixLabors.ImageSharp.Formats.Jpeg;
 using StatybuWeb.Dto;
 
 namespace StatybuWeb.Services.Api
@@ -43,11 +44,15 @@ namespace StatybuWeb.Services.Api
                         // Create a unique name for the picture
                         string uniqueName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
 
-                        // Get a reference to a blob within the container
-                        BlobClient blobClient = containerClient.GetBlobClient(uniqueName);
+                        // Compress the image before uploading
+                        using (var compressedStream = CompressImage(stream))
+                        {
+                            // Get a reference to a blob within the container
+                            BlobClient blobClient = containerClient.GetBlobClient(uniqueName);
 
-                        // Upload the file to Azure Blob storage
-                        await blobClient.UploadAsync(stream, overwrite: true);
+                            // Upload the file to Azure Blob storage
+                            await blobClient.UploadAsync(compressedStream, overwrite: true);
+                        }
                     }
 
                     Console.WriteLine("File uploaded to Azure Blob storage successfully.");
@@ -57,6 +62,30 @@ namespace StatybuWeb.Services.Api
             catch (Exception ex)
             {
                 Console.WriteLine($"Error uploading file to Azure Blob storage: {ex.Message}");
+            }
+        }
+
+        private Stream CompressImage(Stream imageStream)
+        {
+            using (var image = SixLabors.ImageSharp.Image.Load(imageStream))
+            {
+                // Apply compression settings to reduce the size of the image
+                image.Mutate(x => x.Resize(new ResizeOptions
+                {
+                    Size = new Size(800, 600), // Adjust the size as per your requirements
+                    Mode = ResizeMode.Max // Choose the appropriate resize mode
+                }));
+
+                // Create a new memory stream to store the compressed image
+                var compressedStream = new MemoryStream();
+
+                // Save the compressed image to the stream
+                image.Save(compressedStream, new JpegEncoder()); // Choose the appropriate encoder based on the desired output format (e.g., Jpeg, Png, etc.)
+
+                // Rewind the stream to the beginning before returning it
+                compressedStream.Position = 0;
+
+                return compressedStream;
             }
         }
 
