@@ -6,6 +6,7 @@ using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Mvc;
 using StatybuWeb.Services.Api;
 using System.Security.Claims;
+using StatybuWeb.Dto;
 
 namespace StatybuWeb.Controllers
 {
@@ -19,7 +20,6 @@ namespace StatybuWeb.Controllers
             _azureBlobStorageService = azureBlobStorageService;
         }
 
-        [Authorize(AuthenticationSchemes = "Auth0")]
         public async Task<ActionResult> Index()
         {
             return View(await _azureBlobStorageService.GetImagesFilesFromBlobStorage());
@@ -37,23 +37,33 @@ namespace StatybuWeb.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize(AuthenticationSchemes = "Auth0")]
+        public async Task<ActionResult> ImageActions()
+        {
+            return View(await _azureBlobStorageService.GetImagesFilesFromBlobStorage());
+        }
+
+        [Authorize(AuthenticationSchemes = "Auth0")]
         [HttpPost]
-        public async Task<ActionResult> DeleteImages(List<string> fileNames)
+        public async Task<ActionResult> DeleteImages(List<Picture> fileNames)
         {
             BlobContainerClient containerClient = await _azureBlobStorageService.GetAzureBlobContainerClientFromSecrets();
-            foreach (string name in fileNames)
+            foreach (var picture in fileNames)
             {
-                try
+                if (picture.Selected)
                 {
-                    // Get a reference to the file
-                    BlobClient blobClient = containerClient.GetBlobClient(name);
+                    try
+                    {
+                        // Get a reference to the file
+                        BlobClient blobClient = containerClient.GetBlobClient(picture.Name);
 
-                    // Delete the file
-                    await blobClient.DeleteAsync();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error deleting file': {ex.Message}");
+                        // Delete the file
+                        await blobClient.DeleteAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error deleting file': {ex.Message}");
+                    }
                 }
             }
             return RedirectToAction("Index");

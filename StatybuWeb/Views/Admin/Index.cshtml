@@ -1,39 +1,69 @@
-﻿@using StatybuWeb.Dto;
+﻿@using StatybuWeb.Constants;
+@using StatybuWeb.Dto;
 @model List<Picture>
 
-<input type="checkbox" id="toggleCheckbox"> Show Image Selection
 @{
     var nameList = new List<string>();
 }
-
-    <div class="main-gallery">
-        @foreach (var picture in Model)
-        {
-            <div class="gallery-cell">
-                <input type="checkbox" name="fileNames" value="@picture.Name" class="imageCheckbox" onchange="updateNameList(this)" style="display: none" />
-                <img src="@picture.Uri?.AbsoluteUri.ToString()" data="@picture.Name" alt="Image">
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-white border-bottom box-shadow mb-3">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="ImageActions">Image Controls</a>
+                    </li>
+                </ul>
             </div>
-        }
-    </div>
-}
+        </div>
+    </nav>
+</header>
+<h2>Images</h2>
+<div class="carousel">
+    @foreach (var picture in Model.Where(x => FileConstants.ImageExtensions.Contains(x.Extension)))
+    {
+        <div class="carousel-cell">
+            <input type="checkbox" name="fileNames" value="@picture.Name" class="imageCheckbox" onchange="updateNameList(this)" style="display: none" />
+            <img src="@picture.Uri?.AbsoluteUri.ToString()" class="carousel-cell-image" data="@picture.Name" alt="Image">
+        </div>
+    }
+</div>
+<h2>Gifs</h2>
+
+<div class="carousel">
+    @foreach (var picture in Model.Where(x => x.Extension == FileConstants.FileExtensions.Gif))
+    {
+        <div class="carousel-cell">
+            <input type="checkbox" name="fileNames" value="@picture.Name" class="imageCheckbox" onchange="updateNameList(this)" style="display: none" />
+            <img src="@picture.Uri?.AbsoluteUri.ToString()" class="carousel-cell-image" data="@picture.Name" alt="Image">
+        </div>
+    }
+</div>
 
 @using (Html.BeginForm("UploadImage", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
-    <div class="form-group">
-        <label for="file">Select file:</label>
-        <input type="file" id="file" name="file" class="form-control-file" />
+    <div class="p-5">
+        <div class="form-group">
+            <label for="file">Select file:</label>
+            <input type="file" id="file" name="file" class="form-control-file" />
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
     </div>
-
-    <button type="submit" class="btn btn-primary">Upload</button>
 }
 <script src="/js/flickity.pkgd.min.js"></script>
 
 <!-- Initialize the carousel -->
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var flkty = new Flickity('.main-gallery', {
-            wrapAround: true
-            // Configure Flickity options here
+    // creates a node list of all carousels on the same page
+    const carousels = document.querySelectorAll('.carousel');
+
+    carousels.forEach(carousel => {
+        new Flickity(carousel, {
+            imagesLoaded: true
         });
     });
 </script>

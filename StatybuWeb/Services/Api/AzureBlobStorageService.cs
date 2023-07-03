@@ -20,7 +20,9 @@ namespace StatybuWeb.Services.Api
                 BlobClient blobClient = containerClient.GetBlobClient(blobItem.Name);
                 imageUris.Add(new Picture()
                 {
-                    Uri = blobClient.Uri
+                    Uri = blobClient.Uri,
+                    Name= blobItem.Name,
+                    Extension = Path.GetExtension(blobItem.Name)
                 });
             }
 
