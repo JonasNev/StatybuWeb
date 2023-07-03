@@ -20,6 +20,7 @@ namespace StatybuWeb.Controllers
             _azureBlobStorageService = azureBlobStorageService;
         }
 
+        [Authorize(AuthenticationSchemes = "Auth0")]
         public async Task<ActionResult> Index()
         {
             return View(await _azureBlobStorageService.GetImagesFilesFromBlobStorage());
