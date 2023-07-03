@@ -1,4 +1,5 @@
-﻿using StatybuWeb.Dto;
+﻿using Azure.Storage.Blobs;
+using StatybuWeb.Dto;
 
 namespace StatybuWeb.Services.Api
 {
@@ -7,5 +8,6 @@ namespace StatybuWeb.Services.Api
         Task UploadFileToBlobStorage(IFormFile fileToUpload);
         Task<Picture?> GetFileUrlFromBlobStorageAsync(string guid);
         Task<List<Picture>> GetImagesFilesFromBlobStorage();
+        Task<BlobContainerClient> GetAzureBlobContainerClientFromSecrets();
     }
 }
