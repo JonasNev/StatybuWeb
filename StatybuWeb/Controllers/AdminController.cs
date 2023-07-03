@@ -26,7 +26,7 @@ namespace StatybuWeb.Controllers
             return View(await _azureBlobStorageService.GetImagesFilesFromBlobStorage());
         }
 
-        [Authorize(AuthenticationSchemes = "Auth0")]
+        [Authorize(AuthenticationSchemes = "Auth0", Roles ="Admin")]
         [HttpPost]
         public async Task<ActionResult> UploadImage(IFormFile file)
         {
@@ -38,13 +38,13 @@ namespace StatybuWeb.Controllers
             return RedirectToAction("Index");
         }
 
-        [Authorize(AuthenticationSchemes = "Auth0")]
+        [Authorize(AuthenticationSchemes = "Auth0", Roles = "Admin")]
         public async Task<ActionResult> ImageActions()
         {
             return View(await _azureBlobStorageService.GetImagesFilesFromBlobStorage());
         }
 
-        [Authorize(AuthenticationSchemes = "Auth0")]
+        [Authorize(AuthenticationSchemes = "Auth0", Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult> DeleteImages(List<Picture> fileNames)
         {
