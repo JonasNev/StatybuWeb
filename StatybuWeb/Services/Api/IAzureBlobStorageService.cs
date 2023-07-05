@@ -9,5 +9,6 @@ namespace StatybuWeb.Services.Api
         Task<Picture?> GetFileUrlFromBlobStorageAsync(string guid);
         Task<List<Picture>> GetImagesFilesFromBlobStorage();
         Task<BlobContainerClient> GetAzureBlobContainerClientFromSecrets();
+        Task<string> GetSecretFromKeyVault(string secretName);
     }
 }
