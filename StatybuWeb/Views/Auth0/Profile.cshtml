@@ -1,22 +1,154 @@
-﻿@{
+﻿@model StatybuWeb.Models.Auth0.User
+
+@{
     ViewData["Title"] = "User Profile";
+    bool edit = false;
 }
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <h2>@ViewData["Title"].</h2>
-        </div>
-    </div>
+<style>
+    /* Checkbox styling */
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 48px;
+        height: 24px;
+    }
+
+        .toggle-switch input[type="checkbox"] {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+    input[type="checkbox"]:checked + .slider {
+        background-color: #2196F3;
+    }
+
+        input[type="checkbox"]:checked + .slider:before {
+            -webkit-transform: translateX(24px);
+            -ms-transform: translateX(24px);
+            transform: translateX(24px);
+        }
+</style>
+
+<h2>User Profile</h2>
+
+<div class="form-group p-1">
+    <label for="edit">Edit Mode:</label>
+    <label class="toggle-switch">
+        <input type="checkbox" id="editCheckbox" @if (edit)
+        {
+            <text>checked</text>
+        } onchange="toggleEditMode()" />
+        <span class="slider"></span>
+    </label>
+</div>
+
+<div id="editForm" @if (!edit)
+{
+    <text>style="display: none;"</text>
+}>
+    @using (Html.BeginForm("UpdateProfile", "Auth0", FormMethod.Post))
+    {
+          <div class="row">
+               <div class="col-md-2">
+                    @if (string.IsNullOrEmpty(@Model?.user_metadata?.picture))
+                    {
+                        <img src="@Model?.picture" alt="" class="img-fluid rounded-circle" />
+                    }
+                    else
+                    {
+                        <img src="@Model?.user_metadata?.picture" alt="" class="img-fluid rounded-circle" />
+                    }
+               </div>
+               <div class="col-md-4">
+                    <h3>@Model?.user_metadata?.username</h3>
+                    <p>Email: @Model?.email</p>
+               </div>
+          </div>
+
+          <div class="form-group">
+               <label for="username">Username:</label>
+                @Html.TextBoxFor(m => m.user_metadata.username, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.user_metadata.username)
+          </div>
+
+          <div class="form-group">
+                <label for="nickname">Nickname:</label>
+                @Html.TextBoxFor(m => m.user_metadata.nickname, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.user_metadata.nickname)
+          </div>
+
+          <div class="form-group">
+                <label for="picture">Picture:</label>
+                @Html.TextBoxFor(m => m.user_metadata.picture, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.user_metadata.picture)
+          </div>
+          
+          <div class="p-1">
+                <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+    }
+</div>
+
+<div id="plainData" @if (edit)
+{
+    <text>style="display: none;"</text>
+}>
     <div class="row">
         <div class="col-md-2">
-            <img src="@Model.ProfileImage" alt="" class="img-fluid rounded-circle" />
+            @if (string.IsNullOrEmpty(@Model?.user_metadata?.picture))
+            {
+                <img src="@Model?.picture" alt="" class="img-fluid rounded-circle" />
+            }
+            else
+            {
+                <img src="@Model?.user_metadata?.picture" alt="" class="img-fluid rounded-circle" />
+            }
         </div>
         <div class="col-md-4">
-            <h3>@Model.Name</h3>
-            <p>
-                <i class="fas fa-envelope"></i> @Model.EmailAddress
-            </p>
+            <h3>@Model?.user_metadata?.username</h3>
+            <p>Email: @Model?.email</p>
         </div>
     </div>
 </div>
+
+<script>
+    function toggleEditMode() {
+        var checkbox = document.getElementById("editCheckbox");
+        var editForm = document.getElementById("editForm");
+        var plainData = document.getElementById("plainData");
+
+        if (checkbox.checked) {
+            editForm.style.display = "block";
+            plainData.style.display = "none";
+        } else {
+            editForm.style.display = "none";
+            plainData.style.display = "block";
+        }
+    }
+</script>

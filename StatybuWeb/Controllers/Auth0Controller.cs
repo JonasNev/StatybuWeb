@@ -4,11 +4,18 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Auth0.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using StatybuWeb.Services.Auth0;
+using StatybuWeb.Models.Auth0;
 
 namespace StatybuWeb.Controllers
 {
     public class Auth0Controller : Controller
     {
+        private readonly IAuth0Service _auth0Service;
+        public Auth0Controller(IAuth0Service auth0Service)
+        {
+            _auth0Service = auth0Service;
+        }
         public IActionResult Index()
         {
             return View();
@@ -28,7 +35,6 @@ namespace StatybuWeb.Controllers
         [Route("/account/login")]
         public async Task Login(string returnUrl = "/home")
         {
-            var userAuthenticated = User.Identity.IsAuthenticated;
             var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
                 // Indicate here where Auth0 should redirect the user after a login.
                 // Note that the resulting absolute Uri must be added to the
@@ -59,12 +65,18 @@ namespace StatybuWeb.Controllers
         [Route("/account/profile")]
         public IActionResult Profile()
         {
-            return View(new
-            {
-                Name = User.Identity?.Name,
-                EmailAddress = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value,
-                ProfileImage = User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value
-            });
+            string? userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            var user = _auth0Service.GetUser(userId).Result;
+            return View(user);
+        }
+
+        [Authorize(AuthenticationSchemes = "Auth0")]
+        public IActionResult UpdateProfile(User user)
+        {
+            string? userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            var currentUserData = _auth0Service.GetUser(userId).Result;
+            _auth0Service.UpdateUser(userId, user, currentUserData);
+            return RedirectToAction("Profile", user);
         }
     }
 }

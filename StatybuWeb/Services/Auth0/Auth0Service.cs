@@ -1,13 +1,17 @@
 ﻿using Azure.Storage.Blobs;
 using Newtonsoft.Json;
 using StatybuWeb.Constants;
+using StatybuWeb.Dto;
 using StatybuWeb.Models.Auth0;
 using StatybuWeb.Services.Api;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
+using static StatybuWeb.Models.Auth0.User;
 
 namespace StatybuWeb.Services.Auth0
 {
@@ -60,6 +64,68 @@ namespace StatybuWeb.Services.Auth0
             }
 
             return roles;
+        }
+
+        public async Task<User> GetUser(string userId)
+        {
+            var user = new User();
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _auth0ManagementToken);
+
+                // Call Auth0 Management API to get user roles
+                var response = await _httpClient.GetAsync($"/api/v2/users/{userId}");
+                response.EnsureSuccessStatusCode();
+
+                var content = await response.Content.ReadAsStringAsync();
+                user = JsonConvert.DeserializeObject<User>(content);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error occurred while retrieving user roles: {ex.Message}");
+            }
+
+            return user;
+        }
+
+        public async Task UpdateUser(string userId, User newData, User user)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _auth0ManagementToken);
+                var updateDto = PopulateNewData(newData);
+                var json = JsonConvert.SerializeObject(updateDto);
+                var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+                // Call Auth0 Management API to update user data
+                var response = await _httpClient.PatchAsync($"/api/v2/users/{userId}", httpContent);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Error occurred while updating user data: {response.StatusCode} - {errorMessage}");
+                    // Additional error handling or logging can be performed here
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error occurred while updating user data: {ex.Message}");
+                // Additional error handling or logging can be performed here
+            }
+        }
+
+        private UserUpdateDto PopulateNewData(User newData)
+        {
+            var user = new UserUpdateDto()
+            {
+                user_metadata = new UserUpdateDto.User_Metadata()
+                {
+                    username = newData.user_metadata.username,
+                    picture = newData.user_metadata.picture,
+                    nickname = newData.user_metadata.nickname
+                }
+            };
+            return user;
         }
     }
 }
