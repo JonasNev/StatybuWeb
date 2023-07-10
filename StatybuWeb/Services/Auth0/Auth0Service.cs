@@ -1,5 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using StatybuWeb.Constants;
 using StatybuWeb.Dto;
 using StatybuWeb.Models.Auth0;
@@ -94,7 +95,13 @@ namespace StatybuWeb.Services.Auth0
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _auth0ManagementToken);
                 var updateDto = PopulateNewData(newData);
-                var json = JsonConvert.SerializeObject(updateDto);
+
+                var serializerSettings = new JsonSerializerSettings
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                };
+
+                var json = JsonConvert.SerializeObject(updateDto, serializerSettings);
                 var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
                 // Call Auth0 Management API to update user data
@@ -118,11 +125,11 @@ namespace StatybuWeb.Services.Auth0
         {
             var user = new UserUpdateDto()
             {
-                user_metadata = new UserUpdateDto.User_Metadata()
+                User_metadata = new UserUpdateDto.User_Metadata()
                 {
-                    username = newData.user_metadata.username,
-                    picture = newData.user_metadata.picture,
-                    nickname = newData.user_metadata.nickname
+                    Username = newData?.User_metadata?.Username,
+                    Picture = newData?.User_metadata?.Picture,
+                    Nickname = newData?.User_metadata?.Nickname
                 }
             };
             return user;

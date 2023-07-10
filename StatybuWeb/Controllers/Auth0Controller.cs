@@ -47,27 +47,52 @@ namespace StatybuWeb.Controllers
 
         [Authorize(AuthenticationSchemes = "Auth0")]
         [Route("/account/logout")]
-        public async Task<RedirectToActionResult> Logout()
+        public async Task<IActionResult> Logout()
         {
+            var redirectUri = Url.Action("Index", "Home", null, "https");
+
+            if (redirectUri == null)
+            {
+                // Handle the case when redirectUri is null
+                return RedirectToAction("Error");
+            }
+
             var authenticationProperties = new LogoutAuthenticationPropertiesBuilder()
                 // Indicate here where Auth0 should redirect the user after a logout.
                 // Note that the resulting absolute Uri must be added to the
                 // **Allowed Logout URLs** settings for the app.
-                .WithRedirectUri(Url.Action("Index", "Home", null, "https"))
+                .WithRedirectUri(redirectUri)
                 .Build();
 
             await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            Response.Cookies.Delete(".AspNetCore.Cookies");
-            return RedirectToAction("Index","Home");
+
+            if (Response?.Cookies != null)
+            {
+                Response.Cookies.Delete(".AspNetCore.Cookies");
+            }
+
+            return RedirectToAction("Index", "Home");
         }
 
         [Authorize(AuthenticationSchemes = "Auth0")]
         [Route("/account/profile")]
-        public IActionResult Profile()
+        public async Task<IActionResult> Profile()
         {
             string? userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            var user = _auth0Service.GetUser(userId).Result;
+
+            if (userId == null)
+            {
+                return View("Error");
+            }
+
+            var user = await _auth0Service.GetUser(userId);
+
+            if (user == null)
+            {
+                return View("Error");
+            }
+
             return View(user);
         }
 
@@ -75,6 +100,10 @@ namespace StatybuWeb.Controllers
         public IActionResult UpdateProfile(User user)
         {
             string? userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                                return View("Error");
+            }
             var currentUserData = _auth0Service.GetUser(userId).Result;
             _auth0Service.UpdateUser(userId, user, currentUserData);
             return RedirectToAction("Profile", user);

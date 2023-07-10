@@ -4,13 +4,13 @@ namespace StatybuWeb.Dto
 {
     public class UserUpdateDto
     {
-        public User_Metadata user_metadata { get; set; }
+        public User_Metadata? User_metadata { get; set; }
 
         public class User_Metadata
         {
-            public string username { get; set; }
-            public string picture { get; set; }
-            public string nickname { get; set; }
+            public string? Username { get; set; }
+            public string? Picture { get; set; }
+            public string? Nickname { get; set; }
         }
 
     }

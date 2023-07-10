@@ -2,27 +2,27 @@
 {
     public class User
     {
-        public string email { get; set; }
-        public bool email_verified { get; set; }
-        public string username { get; set; }
-        public string phone_number { get; set; }
-        public bool phone_verified { get; set; }
-        public string user_id { get; set; }
-        public string created_at { get; set; }
-        public string updated_at { get; set; }
-        public Identity[] identities { get; set; }
-        public App_Metadata app_metadata { get; set; }
-        public User_Metadata user_metadata { get; set; }
-        public string picture { get; set; }
-        public string name { get; set; }
-        public string nickname { get; set; }
-        public string[] multifactor { get; set; }
-        public string last_ip { get; set; }
-        public string last_login { get; set; }
-        public int logins_count { get; set; }
-        public bool blocked { get; set; }
-        public string given_name { get; set; }
-        public string family_name { get; set; }
+        public string? Email { get; set; }
+        public bool? Email_verified { get; set; }
+        public string? Username { get; set; }
+        public string? Phone_number { get; set; }
+        public bool? Phone_verified { get; set; }
+        public string? User_id { get; set; }
+        public string? Created_at { get; set; }
+        public string? Updated_at { get; set; }
+        public Identity[]? Identities { get; set; }
+        public App_Metadata? App_metadata { get; set; }
+        public User_Metadata? User_metadata { get; set; }
+        public string? Picture { get; set; }
+        public string? Name { get; set; }
+        public string? Nickname { get; set; }
+        public string[]? Multifactor { get; set; }
+        public string? Last_ip { get; set; }
+        public string? Last_login { get; set; }
+        public int? Logins_count { get; set; }
+        public bool? blocked { get; set; }
+        public string? Given_name { get; set; }
+        public string? Family_name { get; set; }
 
         public class App_Metadata
         {
@@ -30,17 +30,17 @@
 
         public class User_Metadata
         {
-            public string username { get; set; }
-            public string picture { get; set; }
-            public string nickname { get; set; }
+            public string? Username { get; set; }
+            public string? Picture { get; set; }
+            public string? Nickname { get; set; }
         }
 
         public class Identity
         {
-            public string connection { get; set; }
-            public string user_id { get; set; }
-            public string provider { get; set; }
-            public bool isSocial { get; set; }
+            public string? Connection { get; set; }
+            public string? User_id { get; set; }
+            public string? Provider { get; set; }
+            public bool IsSocial { get; set; }
         }
 
     }

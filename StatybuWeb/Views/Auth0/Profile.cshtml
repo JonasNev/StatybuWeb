@@ -4,56 +4,7 @@
     ViewData["Title"] = "User Profile";
     bool edit = false;
 }
-
-<style>
-    /* Checkbox styling */
-    .toggle-switch {
-        position: relative;
-        display: inline-block;
-        width: 48px;
-        height: 24px;
-    }
-
-        .toggle-switch input[type="checkbox"] {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        -webkit-transition: .4s;
-        transition: .4s;
-    }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            -webkit-transition: .4s;
-            transition: .4s;
-        }
-
-    input[type="checkbox"]:checked + .slider {
-        background-color: #2196F3;
-    }
-
-        input[type="checkbox"]:checked + .slider:before {
-            -webkit-transform: translateX(24px);
-            -ms-transform: translateX(24px);
-            transform: translateX(24px);
-        }
-</style>
+<link rel="stylesheet" href="~/css/profile.css" />
 
 <h2>User Profile</h2>
 
@@ -76,37 +27,37 @@
     {
           <div class="row">
                <div class="col-md-2">
-                    @if (string.IsNullOrEmpty(@Model?.user_metadata?.picture))
+                    @if (string.IsNullOrEmpty(@Model?.User_metadata?.Picture))
                     {
-                        <img src="@Model?.picture" alt="" class="img-fluid rounded-circle" />
+                        <img src="@Model?.Picture" alt="" class="img-fluid rounded-circle" />
                     }
                     else
                     {
-                        <img src="@Model?.user_metadata?.picture" alt="" class="img-fluid rounded-circle" />
+                        <img src="@Model?.User_metadata?.Picture" alt="" class="img-fluid rounded-circle" />
                     }
                </div>
                <div class="col-md-4">
-                    <h3>@Model?.user_metadata?.username</h3>
-                    <p>Email: @Model?.email</p>
+                    <h3>@Model?.User_metadata?.Username</h3>
+                    <p>Email: @Model?.Email</p>
                </div>
           </div>
 
           <div class="form-group">
                <label for="username">Username:</label>
-                @Html.TextBoxFor(m => m.user_metadata.username, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.user_metadata.username)
+                @Html.TextBoxFor(m => m.User_metadata.Username, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.User_metadata.Username)
           </div>
 
           <div class="form-group">
                 <label for="nickname">Nickname:</label>
-                @Html.TextBoxFor(m => m.user_metadata.nickname, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.user_metadata.nickname)
+                @Html.TextBoxFor(m => m.User_metadata.Nickname, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.User_metadata.Nickname)
           </div>
 
           <div class="form-group">
                 <label for="picture">Picture:</label>
-                @Html.TextBoxFor(m => m.user_metadata.picture, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.user_metadata.picture)
+                @Html.TextBoxFor(m => m.User_metadata.Picture, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.User_metadata.Picture)
           </div>
           
           <div class="p-1">
@@ -121,18 +72,18 @@
 }>
     <div class="row">
         <div class="col-md-2">
-            @if (string.IsNullOrEmpty(@Model?.user_metadata?.picture))
+            @if (string.IsNullOrEmpty(@Model?.User_metadata?.Picture))
             {
-                <img src="@Model?.picture" alt="" class="img-fluid rounded-circle" />
+                <img src="@Model?.Picture" alt="" class="img-fluid rounded-circle" />
             }
             else
             {
-                <img src="@Model?.user_metadata?.picture" alt="" class="img-fluid rounded-circle" />
+                <img src="@Model?.User_metadata?.Picture" alt="" class="img-fluid rounded-circle" />
             }
         </div>
         <div class="col-md-4">
-            <h3>@Model?.user_metadata?.username</h3>
-            <p>Email: @Model?.email</p>
+            <h3>@Model?.User_metadata?.Username</h3>
+            <p>Email: @Model?.Email</p>
         </div>
     </div>
 </div>
