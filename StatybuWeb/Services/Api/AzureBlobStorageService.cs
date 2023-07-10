@@ -143,13 +143,13 @@ namespace StatybuWeb.Services.Api
         {
             BlobServiceClient blobServiceClient = new BlobServiceClient(_connectionString);
 
-            return blobServiceClient.GetBlobContainerClient(_blobContainer);
+            return await Task.FromResult(blobServiceClient.GetBlobContainerClient(_blobContainer));
         }
 
         public async Task<string> GetSecretFromKeyVault(string secretName)
         {
             // Check if the secret exists in the cache
-            if (SecretCache.TryGetValue(secretName, out string cachedSecret))
+            if (SecretCache.TryGetValue(secretName, out var cachedSecret))
             {
                 return cachedSecret;
             }

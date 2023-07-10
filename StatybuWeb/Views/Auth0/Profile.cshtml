@@ -1,22 +1,105 @@
-﻿@{
-    ViewData["Title"] = "User Profile";
-}
+﻿@model StatybuWeb.Models.Auth0.User
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <h2>@ViewData["Title"].</h2>
-        </div>
-    </div>
+@{
+    ViewData["Title"] = "User Profile";
+    bool edit = false;
+}
+<link rel="stylesheet" href="~/css/profile.css" />
+
+<h2>User Profile</h2>
+
+<div class="form-group p-1">
+    <label for="edit">Edit Mode:</label>
+    <label class="toggle-switch">
+        <input type="checkbox" id="editCheckbox" @if (edit)
+        {
+            <text>checked</text>
+        } onchange="toggleEditMode()" />
+        <span class="slider"></span>
+    </label>
+</div>
+
+<div id="editForm" @if (!edit)
+{
+    <text>style="display: none;"</text>
+}>
+    @using (Html.BeginForm("UpdateProfile", "Auth0", FormMethod.Post))
+    {
+          <div class="row">
+               <div class="col-md-2">
+                    @if (string.IsNullOrEmpty(@Model?.User_metadata?.Picture))
+                    {
+                        <img src="@Model?.Picture" alt="" class="img-fluid rounded-circle" />
+                    }
+                    else
+                    {
+                        <img src="@Model?.User_metadata?.Picture" alt="" class="img-fluid rounded-circle" />
+                    }
+               </div>
+               <div class="col-md-4">
+                    <h3>@Model?.User_metadata?.Username</h3>
+                    <p>Email: @Model?.Email</p>
+               </div>
+          </div>
+
+          <div class="form-group">
+               <label for="username">Username:</label>
+                @Html.TextBoxFor(m => m.User_metadata.Username, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.User_metadata.Username)
+          </div>
+
+          <div class="form-group">
+                <label for="nickname">Nickname:</label>
+                @Html.TextBoxFor(m => m.User_metadata.Nickname, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.User_metadata.Nickname)
+          </div>
+
+          <div class="form-group">
+                <label for="picture">Picture:</label>
+                @Html.TextBoxFor(m => m.User_metadata.Picture, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.User_metadata.Picture)
+          </div>
+          
+          <div class="p-1">
+                <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+    }
+</div>
+
+<div id="plainData" @if (edit)
+{
+    <text>style="display: none;"</text>
+}>
     <div class="row">
         <div class="col-md-2">
-            <img src="@Model.ProfileImage" alt="" class="img-fluid rounded-circle" />
+            @if (string.IsNullOrEmpty(@Model?.User_metadata?.Picture))
+            {
+                <img src="@Model?.Picture" alt="" class="img-fluid rounded-circle" />
+            }
+            else
+            {
+                <img src="@Model?.User_metadata?.Picture" alt="" class="img-fluid rounded-circle" />
+            }
         </div>
         <div class="col-md-4">
-            <h3>@Model.Name</h3>
-            <p>
-                <i class="fas fa-envelope"></i> @Model.EmailAddress
-            </p>
+            <h3>@Model?.User_metadata?.Username</h3>
+            <p>Email: @Model?.Email</p>
         </div>
     </div>
 </div>
+
+<script>
+    function toggleEditMode() {
+        var checkbox = document.getElementById("editCheckbox");
+        var editForm = document.getElementById("editForm");
+        var plainData = document.getElementById("plainData");
+
+        if (checkbox.checked) {
+            editForm.style.display = "block";
+            plainData.style.display = "none";
+        } else {
+            editForm.style.display = "none";
+            plainData.style.display = "block";
+        }
+    }
+</script>

@@ -51,8 +51,9 @@ namespace StatybuWeb.Controllers
                 {
                     await _azureBlobStorageService.UploadFileToBlobStorage(file);
                 }
+                return RedirectToAction("Index");
             }
-            return RedirectToAction("Index");
+            return View("Unauthorized");
         }
 
         [Authorize(AuthenticationSchemes = "Auth0")]
@@ -62,7 +63,7 @@ namespace StatybuWeb.Controllers
             {
                 return View(await _azureBlobStorageService.GetImagesFilesFromBlobStorage());
             }
-            return Unauthorized();
+            return View("Unauthorized");
         }
 
         [Authorize(AuthenticationSchemes = "Auth0")]
@@ -92,7 +93,7 @@ namespace StatybuWeb.Controllers
                 }
                 return RedirectToAction("Index");
             }
-            return Unauthorized();
+            return View("Unauthorized");
         }
     }
 }
