@@ -47,7 +47,7 @@ namespace StatybuWeb.Controllers
 
         [Authorize(AuthenticationSchemes = "Auth0")]
         [Route("/account/logout")]
-        public async Task Logout()
+        public async Task<RedirectToActionResult> Logout()
         {
             var authenticationProperties = new LogoutAuthenticationPropertiesBuilder()
                 // Indicate here where Auth0 should redirect the user after a logout.
@@ -59,6 +59,7 @@ namespace StatybuWeb.Controllers
             await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             Response.Cookies.Delete(".AspNetCore.Cookies");
+            return RedirectToAction("Index","Home");
         }
 
         [Authorize(AuthenticationSchemes = "Auth0")]
