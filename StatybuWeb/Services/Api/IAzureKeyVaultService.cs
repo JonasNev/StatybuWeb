@@ -2,6 +2,6 @@
 {
     public interface IAzureKeyVaultService
     {
-
+        Task<string> GetSecretFromKeyVault(string secretName);
     }
 }

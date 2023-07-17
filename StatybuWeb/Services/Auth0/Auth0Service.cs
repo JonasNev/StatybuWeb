@@ -5,42 +5,38 @@ using StatybuWeb.Constants;
 using StatybuWeb.Dto;
 using StatybuWeb.Models.Auth0;
 using StatybuWeb.Services.Api;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
-using static StatybuWeb.Models.Auth0.User;
 
 namespace StatybuWeb.Services.Auth0
 {
     public class Auth0Service : IAuth0Service
     {
         private readonly HttpClient _httpClient;
-        private readonly IAzureBlobStorageService _azureBlobStorageService;
+        private readonly IAzureKeyVaultService _azureKeyVaultService;
         private readonly string _auth0ManagementToken;
+        private readonly ILogger<Auth0Service> _logger;
 
-        public Auth0Service(IHttpContextAccessor httpContextAccessor, IAzureBlobStorageService azureBlobStorageService)
+        public Auth0Service(IAzureKeyVaultService azureKeyVaultService, ILogger<Auth0Service> logger)
         {
+            _azureKeyVaultService = azureKeyVaultService;
             _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri("https://dev-4b6q5857i7jcmzkw.eu.auth0.com/");
+            _httpClient.BaseAddress = new Uri(_azureKeyVaultService.GetSecretFromKeyVault(AzureConstants.KeyVaultSecretNames.BaseAuth0Address).GetAwaiter().GetResult());
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            _azureBlobStorageService = azureBlobStorageService;
             _auth0ManagementToken = InitializeAuth0ManagementToken().GetAwaiter().GetResult();
+            _logger = logger;
         }
 
         private async Task<string> InitializeAuth0ManagementToken()
         {
             try
             {
-                return await _azureBlobStorageService.GetSecretFromKeyVault(AzureConstants.KeyVaultSecretNames.Auth0ManagementToken10D);
+                return await _azureKeyVaultService.GetSecretFromKeyVault(AzureConstants.KeyVaultSecretNames.Auth0ManagementToken100D);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error occurred while initializing Auth0 management token: {ex.Message}");
+                _logger.LogError($"Error occurred while initializing Auth0 management token: {ex.Message}");
                 throw;
             }
         }
@@ -61,7 +57,7 @@ namespace StatybuWeb.Services.Auth0
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error occurred while retrieving user roles: {ex.Message}");
+                _logger.LogError($"Error occurred while retrieving user roles: {ex.Message}");
             }
 
             return roles;
@@ -83,7 +79,7 @@ namespace StatybuWeb.Services.Auth0
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error occurred while retrieving user roles: {ex.Message}");
+                _logger.LogError($"Error occurred while retrieving user roles: {ex.Message}");
             }
 
             return user;
@@ -110,13 +106,13 @@ namespace StatybuWeb.Services.Auth0
                 if (!response.IsSuccessStatusCode)
                 {
                     var errorMessage = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Error occurred while updating user data: {response.StatusCode} - {errorMessage}");
+                    _logger.LogError($"Error occurred while updating user data: {response.StatusCode} - {errorMessage}");
                     // Additional error handling or logging can be performed here
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error occurred while updating user data: {ex.Message}");
+                _logger.LogError($"Error occurred while updating user data: {ex.Message}");
                 // Additional error handling or logging can be performed here
             }
         }

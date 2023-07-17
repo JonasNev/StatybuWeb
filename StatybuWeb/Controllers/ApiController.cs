@@ -6,11 +6,9 @@ namespace StatybuWeb.Controllers
 {
     public class ApiController : Controller
     {
-        private readonly IAzureService _azureService;
         private readonly IAzureBlobStorageService _azureBlobStorageService;
-        public ApiController(IAzureService azureService, IAzureBlobStorageService azureBlobStorageService)
+        public ApiController(IAzureBlobStorageService azureBlobStorageService)
         {
-            _azureService = azureService;
             _azureBlobStorageService = azureBlobStorageService;
         }
 

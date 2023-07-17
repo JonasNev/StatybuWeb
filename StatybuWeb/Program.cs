@@ -15,7 +15,6 @@ builder.Services.AddResponseCompression(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddTransient<IAzureService, AzureService>();
 builder.Services.AddTransient<IAzureBlobStorageService, AzureBlobStorageService>();
 builder.Services.AddTransient<IAzureKeyVaultService, AzureKeyVaultService>();
 builder.Services.AddTransient<IAuth0Service,Auth0Service>();

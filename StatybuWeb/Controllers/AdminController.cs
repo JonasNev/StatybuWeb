@@ -13,15 +13,17 @@ namespace StatybuWeb.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly IAzureService _azureService;
         private readonly IAzureBlobStorageService _azureBlobStorageService;
         private readonly IAuth0Service _auth0Service;
+        private readonly ILogger<AdminController> _logger;
 
-        public AdminController(IAzureService azureService, IAzureBlobStorageService azureBlobStorageService, IAuth0Service auth0Service)
+        public AdminController(IAzureBlobStorageService azureBlobStorageService, 
+            IAuth0Service auth0Service,
+            ILogger<AdminController> logger)
         {
-            _azureService = azureService;
             _azureBlobStorageService = azureBlobStorageService;
             _auth0Service = auth0Service;
+            _logger = logger;
         }
 
         private bool IsUserAuthorized(string role)
@@ -84,10 +86,12 @@ namespace StatybuWeb.Controllers
 
                             // Delete the file
                             await blobClient.DeleteAsync();
+
+                            _logger.LogInformation($"Success deleting file': {picture.Name}");
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"Error deleting file': {ex.Message}");
+                            _logger.LogError($"Error deleting file': {ex.Message}");
                         }
                     }
                 }

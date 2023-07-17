@@ -10,7 +10,8 @@
             public const string Auth0ClientSecret = "Auth0ClientSecret";
             public const string Auth0ClientId = "Auth0ClientId";
             public const string Auth0Domain = "Auth0Domain";
-            public const string Auth0ManagementToken10D = "Auth0ManagementToken10D";
+            public const string Auth0ManagementToken100D = "Auth0ManagementToken100D";
+            public const string BaseAuth0Address = "BaseAuth0Address";
         }
     }
 }

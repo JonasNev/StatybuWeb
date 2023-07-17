@@ -9,22 +9,19 @@ namespace StatybuWeb.Services.Api
 {
     public class AzureBlobStorageService : IAzureBlobStorageService
     {
-        private static readonly Dictionary<string, string> SecretCache = new Dictionary<string, string>();
-        private static readonly object CacheLock = new object();
         private readonly ILogger<AzureBlobStorageService> _logger;
-        private readonly SecretClient _keyVaultClient;
+        private readonly IAzureKeyVaultService _azureKeyVaultService;
         private string _connectionString;
         private string _blobContainer;
 
-        public AzureBlobStorageService(ILogger<AzureBlobStorageService> logger)
+        public AzureBlobStorageService(ILogger<AzureBlobStorageService> logger,
+            IAzureKeyVaultService azureKeyVaultService)
         {
             _logger = logger;
-            var credential = new DefaultAzureCredential();
-            _keyVaultClient = new SecretClient(new Uri(Constants.AzureConstants.KeyVaultUrl), credential);
-
+            _azureKeyVaultService = azureKeyVaultService;
             // Fetch the secrets at the start of the application
-            _connectionString = GetSecretFromKeyVault(Constants.AzureConstants.KeyVaultSecretNames.ConnectionString).GetAwaiter().GetResult();
-            _blobContainer = GetSecretFromKeyVault(Constants.AzureConstants.KeyVaultSecretNames.BlobContainer).GetAwaiter().GetResult();
+            _connectionString = _azureKeyVaultService.GetSecretFromKeyVault(Constants.AzureConstants.KeyVaultSecretNames.ConnectionString).GetAwaiter().GetResult();
+            _blobContainer = _azureKeyVaultService.GetSecretFromKeyVault(Constants.AzureConstants.KeyVaultSecretNames.BlobContainer).GetAwaiter().GetResult();
         }
 
         public async Task<List<Picture>> GetImagesFilesFromBlobStorage()
@@ -144,30 +141,6 @@ namespace StatybuWeb.Services.Api
             BlobServiceClient blobServiceClient = new BlobServiceClient(_connectionString);
 
             return await Task.FromResult(blobServiceClient.GetBlobContainerClient(_blobContainer));
-        }
-
-        public async Task<string> GetSecretFromKeyVault(string secretName)
-        {
-            // Check if the secret exists in the cache
-            if (SecretCache.TryGetValue(secretName, out var cachedSecret))
-            {
-                return cachedSecret;
-            }
-
-            // Retrieve the secret from Key Vault outside the lock
-            KeyVaultSecret secret = await _keyVaultClient.GetSecretAsync(secretName);
-
-            lock (CacheLock)
-            {
-                // Double-check within the lock to prevent multiple threads from simultaneously updating the cache
-                if (!SecretCache.ContainsKey(secretName))
-                {
-                    // Cache the retrieved secret
-                    SecretCache[secretName] = secret.Value;
-                }
-            }
-
-            return secret.Value;
         }
     }
 }
