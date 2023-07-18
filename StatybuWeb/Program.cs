@@ -3,11 +3,13 @@ using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualBasic;
+using StatybuWeb.Constants;
 using StatybuWeb.Services.Api;
 using StatybuWeb.Services.Auth0;
 
 var builder = WebApplication.CreateBuilder(args);
+var credential = new DefaultAzureCredential();
+var secretClient = new SecretClient(new Uri(AzureConstants.KeyVaultUrl), credential);
 builder.Services.AddResponseCompression(options =>
 {
     options.EnableForHttps = true;
@@ -18,22 +20,20 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IAzureBlobStorageService, AzureBlobStorageService>();
 builder.Services.AddTransient<IAzureKeyVaultService, AzureKeyVaultService>();
 builder.Services.AddTransient<IAuth0Service,Auth0Service>();
-
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
 {
-    options.Authority = "https://dev-4b6q5857i7jcmzkw.eu.auth0.com/";
-    options.Audience = "https://statybuweb.azurewebsites.net";
+    options.Authority = secretClient.GetSecretAsync(StatybuWeb.Constants.AzureConstants.KeyVaultSecretNames.Auth0Domain)?.Result?.Value?.ToString();
+    options.Audience = StatybuWeb.Constants.AzureConstants.KeyVaultUrl;
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        RoleClaimType = "https://dev-4b6q5857i7jcmzkw.eu.auth0.com/roles",// Replace with your actual claim type
+        RoleClaimType = $"{options.Authority}/roles",// Replace with your actual claim type
     };
 });
-var credential = new DefaultAzureCredential();
-var secretClient = new SecretClient(new Uri(StatybuWeb.Constants.AzureConstants.KeyVaultUrl), credential);
+
 
 // Fetch secrets from Key Vault
 var auth0DomainSecret = secretClient.GetSecretAsync(StatybuWeb.Constants.AzureConstants.KeyVaultSecretNames.Auth0Domain).Result.Value;
