@@ -1,7 +1,4 @@
-﻿using Auth0.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Mvc;
 using StatybuWeb.Services.Api;

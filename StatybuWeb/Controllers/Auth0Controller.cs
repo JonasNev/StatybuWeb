@@ -6,15 +6,22 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using StatybuWeb.Services.Auth0;
 using StatybuWeb.Models.Auth0;
+using StatybuWeb.Services.Api;
 
 namespace StatybuWeb.Controllers
 {
     public class Auth0Controller : Controller
     {
         private readonly IAuth0Service _auth0Service;
-        public Auth0Controller(IAuth0Service auth0Service)
+        private readonly ILogger<Auth0Controller> _logger;
+        private readonly IAzureKeyVaultService _azureKeyVaultService;
+        public Auth0Controller(IAuth0Service auth0Service,
+            ILogger<Auth0Controller> logger,
+            IAzureKeyVaultService azureKeyVaultService)
         {
             _auth0Service = auth0Service;
+            _logger = logger;
+            _azureKeyVaultService = azureKeyVaultService;
         }
         public IActionResult Index()
         {
@@ -49,31 +56,30 @@ namespace StatybuWeb.Controllers
         [Route("/account/logout")]
         public async Task<IActionResult> Logout()
         {
-            var redirectUri = Url.Action("Index", "Home", null, "https");
+            await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            Response?.Cookies?.Delete(".AspNetCore.Cookies");
+
+            var auth0Domain = _azureKeyVaultService.GetSecretFromKeyVault(Constants.AzureConstants.KeyVaultSecretNames.Auth0Domain)?.Result;
+            var auth0ClientId = _azureKeyVaultService.GetSecretFromKeyVault(Constants.AzureConstants.KeyVaultSecretNames.Auth0ClientId)?.Result;
+
+            if (string.IsNullOrEmpty(auth0Domain) || string.IsNullOrEmpty(auth0ClientId))
+            {
+                _logger.LogError("Error: Required Auth0 values from Azure Vault are null or empty");
+                return View("Error");
+            }
+
+            var redirectUri = Url.Action("Index", "Home", null, "https") ?? Url.Action("Error", "Home", null, "https");
 
             if (redirectUri == null)
             {
-                // Handle the case when redirectUri is null
-                return RedirectToAction("Error");
+                _logger.LogError("Error: Could not generate a valid redirect URI");
+                return View("Error");
             }
 
-            var authenticationProperties = new LogoutAuthenticationPropertiesBuilder()
-                // Indicate here where Auth0 should redirect the user after a logout.
-                // Note that the resulting absolute Uri must be added to the
-                // **Allowed Logout URLs** settings for the app.
-                .WithRedirectUri(redirectUri)
-                .Build();
-
-            await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            if (Response?.Cookies != null)
-            {
-                Response.Cookies.Delete(".AspNetCore.Cookies");
-            }
-
-            return RedirectToAction("Index", "Home");
+            return Redirect($"https://{auth0Domain}/v2/logout?client_id={auth0ClientId}&returnTo={Uri.EscapeDataString(redirectUri)}");
         }
+
 
         [Authorize(AuthenticationSchemes = "Auth0")]
         [Route("/account/profile")]
