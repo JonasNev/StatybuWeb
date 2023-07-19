@@ -1,4 +1,6 @@
-﻿namespace StatybuWeb.Models.Auth0
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace StatybuWeb.Models.Auth0
 {
     public class User
     {
@@ -31,8 +33,10 @@
         public class User_Metadata
         {
             public string? Username { get; set; }
+            [RegularExpression(@"(\.jpg|\.jpeg|\.png|\.gif)$")]
             public string? Picture { get; set; }
             public string? Nickname { get; set; }
+            public string? SteamId { get; set; }
         }
 
         public class Identity

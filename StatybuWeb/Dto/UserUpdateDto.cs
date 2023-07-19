@@ -11,6 +11,7 @@ namespace StatybuWeb.Dto
             public string? Username { get; set; }
             public string? Picture { get; set; }
             public string? Nickname { get; set; }
+            public string? SteamId { get; set; }
         }
 
     }

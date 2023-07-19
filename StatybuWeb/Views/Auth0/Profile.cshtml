@@ -59,6 +59,12 @@
                 @Html.TextBoxFor(m => m.User_metadata.Picture, new { @class = "form-control" })
                 @Html.ValidationMessageFor(m => m.User_metadata.Picture)
           </div>
+
+          <div class="form-group">
+                <label for="picture">Picture:</label>
+                @Html.TextBoxFor(m => m.User_metadata.SteamId, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.User_metadata.SteamId)
+          </div>
           
           <div class="p-1">
                 <button type="submit" class="btn btn-primary">Save</button>
