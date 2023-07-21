@@ -5,17 +5,19 @@ namespace StatybuWeb.Controllers
 {
     public class SteamController : Controller
     {
-        private readonly SteamService _steamService;
+        private readonly ISteamService _steamService;
 
-        public SteamController(SteamService steamService)
+        public SteamController(ISteamService steamService)
         {
             _steamService = steamService;
         }
 
-        public async Task<IActionResult> Friends(string id)
+        [HttpGet]
+        [Route("Steam/Friends/{steamId?}")]
+        public async Task<IActionResult> Friends(string steamId)
         {
-            var model = await _steamService.GetFriendsListAsync(id);
-            return View(model);
+            var model = await _steamService.GetFriendsList(steamId);
+            return PartialView(model);
         }
     }
 }

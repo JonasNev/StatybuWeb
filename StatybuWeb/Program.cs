@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using StatybuWeb.Constants;
 using StatybuWeb.Services.Api;
 using StatybuWeb.Services.Auth0;
+using StatybuWeb.Services.Steam;
 
 var builder = WebApplication.CreateBuilder(args);
 var credential = new DefaultAzureCredential();
@@ -20,6 +21,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IAzureBlobStorageService, AzureBlobStorageService>();
 builder.Services.AddTransient<IAzureKeyVaultService, AzureKeyVaultService>();
 builder.Services.AddTransient<IAuth0Service,Auth0Service>();
+builder.Services.AddTransient<ISteamService, SteamService>();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

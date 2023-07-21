@@ -4,6 +4,7 @@ namespace StatybuWeb.Services.Steam
 {
     public interface ISteamService
     {
-        Task<SteamFriends> GetFriendsListAsync(string steamId);
+        Task<IEnumerable<Player>> GetFriendsList(string steamId);
+        Task<IEnumerable<Player>> GetFriendSummaries(IEnumerable<string> steamIds);
     }
 }

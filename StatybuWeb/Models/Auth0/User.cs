@@ -14,7 +14,7 @@ namespace StatybuWeb.Models.Auth0
         public string? Updated_at { get; set; }
         public Identity[]? Identities { get; set; }
         public App_Metadata? App_metadata { get; set; }
-        public User_Metadata? User_metadata { get; set; }
+        public User_Metadata User_metadata { get; set; }
         public string? Picture { get; set; }
         public string? Name { get; set; }
         public string? Nickname { get; set; }

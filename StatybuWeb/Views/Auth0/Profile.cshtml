@@ -61,7 +61,7 @@
           </div>
 
           <div class="form-group">
-                <label for="picture">Picture:</label>
+                <label for="picture">Steam ID:</label>
                 @Html.TextBoxFor(m => m.User_metadata.SteamId, new { @class = "form-control" })
                 @Html.ValidationMessageFor(m => m.User_metadata.SteamId)
           </div>
@@ -94,6 +94,18 @@
     </div>
 </div>
 
+<div>
+    @if (!String.IsNullOrEmpty(Model?.User_metadata?.SteamId))
+    {
+        <div id="loading" class="mx-auto" style="display: none;">
+            <h2>Loading Steam Friend List</h2>
+            <img src="/images/loading-thinking.gif" alt="Loading..." />
+        </div>
+        <div id="partialViewContainer"></div>
+    }
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     function toggleEditMode() {
         var checkbox = document.getElementById("editCheckbox");
@@ -108,4 +120,20 @@
             plainData.style.display = "block";
         }
     }
+    $(document).ready(function () {
+        $('#loading').show();
+        $.ajax({
+            url: '@Url.Action("Friends", "Steam")',
+            type: 'GET',
+            data: { steamId: '@Model.User_metadata.SteamId' }, // pass any data to the action method here
+            success: function (result) {
+                $('#partialViewContainer').html(result); // insert the result into the div
+                // Hide loading icon
+                $('#loading').hide();
+            },
+            error: function (xhr, status, error) {
+                console.error('Error occurred: ', error);
+            }
+        });
+    });
 </script>

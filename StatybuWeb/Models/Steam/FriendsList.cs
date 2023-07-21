@@ -2,6 +2,6 @@
 {
     public class FriendsList
     {
-        public List<Friend> friends { get; set; }
+        public Friend[] friends { get; set; }
     }
 }
