@@ -124,26 +124,29 @@
 }
 
 $(document).ready(function () {
-    $('#loading').show();
-    $.ajax({
-        url: '@Url.Action("Friends", "Steam")',
-        type: 'GET',
-        data: { steamId: '@Model.User_metadata.SteamId' },
-        success: function (result) {
-            $('#partialViewContainer').html(result);
-            $('#loading').hide();
-        },
-        error: function (xhr, status, error) {
-            console.error('Error occurred: ', error);
-            $('#loading').hide();
-            if (xhr.status === 404) {
-                $('#errorMsg').show().text('Error: The Steam ID does not exist.');
-            } else if (xhr.status === 500) {
-                $('#errorMsg').show().text('Error: There was a server error.');
-            } else {
-                $('#errorMsg').show().text('Error: The Steam ID does not have a correct value.');
+    var steamId = '@Model.User_metadata.SteamId';
+    if (steamId) { // checks if steamId is not null and not an empty string
+        $('#loading').show();
+        $.ajax({
+            url: '@Url.Action("Friends", "Steam")',
+            type: 'GET',
+            data: { steamId: steamId },
+            success: function (result) {
+                $('#partialViewContainer').html(result);
+                $('#loading').hide();
+            },
+            error: function (xhr, status, error) {
+                console.error('Error occurred: ', error);
+                $('#loading').hide();
+                if (xhr.status === 404) {
+                    $('#errorMsg').show().text('Error: The Steam ID does not exist.');
+                } else if (xhr.status === 500) {
+                    $('#errorMsg').show().text('Error: There was a server error.');
+                } else {
+                    $('#errorMsg').show().text('Error: The Steam ID does not have a correct value.');
+                }
             }
-        }
-    });
+        });
+    }
 });
 </script>
