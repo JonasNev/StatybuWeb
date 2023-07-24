@@ -59,6 +59,12 @@
                 @Html.TextBoxFor(m => m.User_metadata.Picture, new { @class = "form-control" })
                 @Html.ValidationMessageFor(m => m.User_metadata.Picture)
           </div>
+
+          <div class="form-group">
+                <label for="picture">Steam ID:</label>
+                @Html.TextBoxFor(m => m.User_metadata.SteamId, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.User_metadata.SteamId)
+          </div>
           
           <div class="p-1">
                 <button type="submit" class="btn btn-primary">Save</button>
@@ -88,18 +94,59 @@
     </div>
 </div>
 
-<script>
-    function toggleEditMode() {
-        var checkbox = document.getElementById("editCheckbox");
-        var editForm = document.getElementById("editForm");
-        var plainData = document.getElementById("plainData");
-
-        if (checkbox.checked) {
-            editForm.style.display = "block";
-            plainData.style.display = "none";
-        } else {
-            editForm.style.display = "none";
-            plainData.style.display = "block";
-        }
+<div>
+    @if (!String.IsNullOrEmpty(Model?.User_metadata?.SteamId))
+    {
+        <div id="loading" class="mx-auto" style="display: none;">
+            <h2>Loading Steam Friend List</h2>
+            <img src="/images/loading-thinking.gif" alt="Loading..." />
+        </div>
+        <div id="partialViewContainer"></div>
     }
+</div>
+<div id="errorMsg" class="alert alert-danger" style="display: none;"></div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+   function toggleEditMode() {
+    var checkbox = document.getElementById("editCheckbox");
+    var editForm = document.getElementById("editForm");
+    var plainData = document.getElementById("plainData");
+
+    if (checkbox.checked) {
+        editForm.style.display = "block";
+        plainData.style.display = "none";
+    } else {
+        editForm.style.display = "none";
+        plainData.style.display = "block";
+    }
+}
+
+$(document).ready(function () {
+    var steamId = '@Model.User_metadata.SteamId';
+    if (steamId) { // checks if steamId is not null and not an empty string
+        $('#loading').show();
+        $.ajax({
+            url: '@Url.Action("Friends", "Steam")',
+            type: 'GET',
+            data: { steamId: steamId },
+            success: function (result) {
+                $('#partialViewContainer').html(result);
+                $('#loading').hide();
+            },
+            error: function (xhr, status, error) {
+                console.error('Error occurred: ', error);
+                $('#loading').hide();
+                if (xhr.status === 404) {
+                    $('#errorMsg').show().text('Error: The Steam ID does not exist.');
+                } else if (xhr.status === 500) {
+                    $('#errorMsg').show().text('Error: There was a server error.');
+                } else {
+                    $('#errorMsg').show().text('Error: The Steam ID does not have a correct value.');
+                }
+            }
+        });
+    }
+});
 </script>

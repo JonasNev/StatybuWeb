@@ -1,4 +1,6 @@
-﻿namespace StatybuWeb.Models.Auth0
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace StatybuWeb.Models.Auth0
 {
     public class User
     {
@@ -12,7 +14,7 @@
         public string? Updated_at { get; set; }
         public Identity[]? Identities { get; set; }
         public App_Metadata? App_metadata { get; set; }
-        public User_Metadata? User_metadata { get; set; }
+        public User_Metadata User_metadata { get; set; }
         public string? Picture { get; set; }
         public string? Name { get; set; }
         public string? Nickname { get; set; }
@@ -33,6 +35,8 @@
             public string? Username { get; set; }
             public string? Picture { get; set; }
             public string? Nickname { get; set; }
+            [RegularExpression(@"^[0-9]{17}$", ErrorMessage = "Invalid Steam ID. Steam ID should be a 17-digit number.")]
+            public string? SteamId { get; set; }
         }
 
         public class Identity

@@ -105,10 +105,16 @@ namespace StatybuWeb.Controllers
         [Authorize(AuthenticationSchemes = "Auth0")]
         public IActionResult UpdateProfile(User user)
         {
+            if (!ModelState.IsValid)
+            {
+                // The model is not valid, return the same view to display the validation errors
+                return View("Profile", user);
+            }
+
             string? userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
             {
-                                return View("Error");
+                return View("Error");
             }
             var currentUserData = _auth0Service.GetUser(userId).Result;
             _auth0Service.UpdateUser(userId, user, currentUserData);

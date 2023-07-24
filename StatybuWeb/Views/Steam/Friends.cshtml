@@ -1,0 +1,32 @@
+﻿@using StatybuWeb.Models.Steam;
+@model IEnumerable<Player>
+
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Avatar</th>
+                    <th>Persona Name</th>
+                    <th>Persona State</th>
+                    <th>Profile URL</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var player in Model)
+                {
+                    <tr>
+                        <td>
+                            <img src="@player.avatar" alt="@player.personaname's avatar" class="img-fluid" />
+                        </td>
+                        <td>@player.personaname</td>
+                        <td>@player.personastate</td>
+                        <td>
+                            <a href="@player.profileurl" target="_blank">Profile Link</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

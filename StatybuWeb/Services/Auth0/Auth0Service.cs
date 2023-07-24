@@ -125,7 +125,8 @@ namespace StatybuWeb.Services.Auth0
                 {
                     Username = newData?.User_metadata?.Username,
                     Picture = newData?.User_metadata?.Picture,
-                    Nickname = newData?.User_metadata?.Nickname
+                    Nickname = newData?.User_metadata?.Nickname,
+                    SteamId = newData?.User_metadata?.SteamId
                 }
             };
             return user;
