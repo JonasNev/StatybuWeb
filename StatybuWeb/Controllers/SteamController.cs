@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StatybuWeb.Services.Steam;
+using System.Reflection;
 
 namespace StatybuWeb.Controllers
 {
@@ -16,8 +17,18 @@ namespace StatybuWeb.Controllers
         [Route("Steam/Friends/{steamId?}")]
         public async Task<IActionResult> Friends(string steamId)
         {
-            var model = await _steamService.GetFriendsList(steamId);
-            return PartialView(model);
+            try
+            {
+                var model = await _steamService.GetFriendsList(steamId);
+                return PartialView(model);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "User not found")
+                    return NotFound("Error: The Steam ID does not exist.");
+                else
+                    return StatusCode(500, "Error: There was a server error.");
+            }
         }
     }
 }

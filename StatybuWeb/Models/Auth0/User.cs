@@ -33,9 +33,9 @@ namespace StatybuWeb.Models.Auth0
         public class User_Metadata
         {
             public string? Username { get; set; }
-            [RegularExpression(@"(\.jpg|\.jpeg|\.png|\.gif)$")]
             public string? Picture { get; set; }
             public string? Nickname { get; set; }
+            [RegularExpression(@"^[0-9]{17}$", ErrorMessage = "Invalid Steam ID. Steam ID should be a 17-digit number.")]
             public string? SteamId { get; set; }
         }
 

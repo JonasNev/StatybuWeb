@@ -23,7 +23,13 @@ namespace StatybuWeb.Services.Steam
 
         public async Task<IEnumerable<Player>> GetFriendsList(string steamId)
         {
-            var steamFriends = await _httpClient.GetAsync($"{SteamConstants.FriendListApiBaseUrl}?key={_apiKey}&steamid={steamId}&relationship=friend");
+            var steamFriends = await _httpClient.GetAsync($"{SteamConstants.FriendListApiBaseUrl}?key={_apiKey}&steamid={steamId}&relationship=friend")
+                ;
+            if (!steamFriends.IsSuccessStatusCode)
+            {
+                throw new Exception("User not found");
+            }
+
             var steamResponseJson = await steamFriends.Content.ReadAsStringAsync();
             var steamResponse = System.Text.Json.JsonSerializer.Deserialize<SteamResponse>(steamResponseJson);
             var friends = steamResponse.friendslist.friends;

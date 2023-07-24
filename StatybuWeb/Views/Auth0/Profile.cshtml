@@ -104,36 +104,46 @@
         <div id="partialViewContainer"></div>
     }
 </div>
+<div id="errorMsg" class="alert alert-danger" style="display: none;"></div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script>
-    function toggleEditMode() {
-        var checkbox = document.getElementById("editCheckbox");
-        var editForm = document.getElementById("editForm");
-        var plainData = document.getElementById("plainData");
 
-        if (checkbox.checked) {
-            editForm.style.display = "block";
-            plainData.style.display = "none";
-        } else {
-            editForm.style.display = "none";
-            plainData.style.display = "block";
-        }
+<script>
+   function toggleEditMode() {
+    var checkbox = document.getElementById("editCheckbox");
+    var editForm = document.getElementById("editForm");
+    var plainData = document.getElementById("plainData");
+
+    if (checkbox.checked) {
+        editForm.style.display = "block";
+        plainData.style.display = "none";
+    } else {
+        editForm.style.display = "none";
+        plainData.style.display = "block";
     }
-    $(document).ready(function () {
-        $('#loading').show();
-        $.ajax({
-            url: '@Url.Action("Friends", "Steam")',
-            type: 'GET',
-            data: { steamId: '@Model.User_metadata.SteamId' }, // pass any data to the action method here
-            success: function (result) {
-                $('#partialViewContainer').html(result); // insert the result into the div
-                // Hide loading icon
-                $('#loading').hide();
-            },
-            error: function (xhr, status, error) {
-                console.error('Error occurred: ', error);
+}
+
+$(document).ready(function () {
+    $('#loading').show();
+    $.ajax({
+        url: '@Url.Action("Friends", "Steam")',
+        type: 'GET',
+        data: { steamId: '@Model.User_metadata.SteamId' },
+        success: function (result) {
+            $('#partialViewContainer').html(result);
+            $('#loading').hide();
+        },
+        error: function (xhr, status, error) {
+            console.error('Error occurred: ', error);
+            $('#loading').hide();
+            if (xhr.status === 404) {
+                $('#errorMsg').show().text('Error: The Steam ID does not exist.');
+            } else if (xhr.status === 500) {
+                $('#errorMsg').show().text('Error: There was a server error.');
+            } else {
+                $('#errorMsg').show().text('Error: The Steam ID does not have a correct value.');
             }
-        });
+        }
     });
+});
 </script>
