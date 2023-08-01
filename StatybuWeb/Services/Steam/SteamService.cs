@@ -1,32 +1,32 @@
 ﻿using StatybuWeb.Constants;
 using StatybuWeb.Models.Steam;
 using StatybuWeb.Services.Api;
-using System.Net.Http;
-using Microsoft.Extensions.Options;
-using System.Text.Json;
-using Newtonsoft.Json;
+using StatybuWeb.Services.Steam;
 
-namespace StatybuWeb.Services.Steam
+public class SteamService : ISteamService
 {
-    public class SteamService : ISteamService
+    private readonly HttpClient _httpClient;
+    private readonly IAzureKeyVaultService _azureKeyVaultService;
+    private readonly ILogger<SteamService> _logger;
+    private string _apiKey;
+
+    public SteamService(IAzureKeyVaultService azureKeyVaultService, HttpClient httpClient, ILogger<SteamService> logger)
     {
-        private readonly HttpClient _httpClient;
-        private readonly IAzureKeyVaultService _azureKeyVaultService;
-        private string _apiKey; 
+        _httpClient = httpClient;
+        _azureKeyVaultService = azureKeyVaultService;
+        _logger = logger;
+        _apiKey = _azureKeyVaultService.GetSecretFromKeyVault(SteamConstants.KeyVaultSecretNames.SteamApiKey).GetAwaiter().GetResult();
+    }
 
-        public SteamService(IAzureKeyVaultService azureKeyVaultService)
+    public async Task<IEnumerable<Player>> GetFriendsList(string steamId)
+    {
+        try
         {
-            _httpClient = new HttpClient();
-            _azureKeyVaultService = azureKeyVaultService;
-            _apiKey = _azureKeyVaultService.GetSecretFromKeyVault(SteamConstants.KeyVaultSecretNames.SteamApiKey).GetAwaiter().GetResult();
-        }
+            var steamFriends = await _httpClient.GetAsync($"{SteamConstants.FriendListApiBaseUrl}?key={_apiKey}&steamid={steamId}&relationship=friend");
 
-        public async Task<IEnumerable<Player>> GetFriendsList(string steamId)
-        {
-            var steamFriends = await _httpClient.GetAsync($"{SteamConstants.FriendListApiBaseUrl}?key={_apiKey}&steamid={steamId}&relationship=friend")
-                ;
             if (!steamFriends.IsSuccessStatusCode)
             {
+                _logger.LogError("User not found");
                 throw new Exception("User not found");
             }
 
@@ -46,14 +46,32 @@ namespace StatybuWeb.Services.Steam
             var players = playerBatches.SelectMany(players => players);
             return players.Where(x => x.personastate != PersonaState.Offline).OrderBy(player => player.personastate);
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting the friends list");
+            throw;
+        }
+    }
 
-        public async Task<IEnumerable<Player>> GetFriendSummaries(IEnumerable<string> steamIds)
+    public async Task<IEnumerable<Player>> GetFriendSummaries(IEnumerable<string> steamIds)
+    {
+        try
         {
             var playersummariesHttpMessage = await _httpClient.GetAsync($"{SteamConstants.PlayerSummariesBaseUrl}?key={_apiKey}&steamids={string.Join(",", steamIds)}");
             playersummariesHttpMessage.EnsureSuccessStatusCode();
             var steamFriendsStatusJson = await playersummariesHttpMessage.Content.ReadAsStringAsync();
             var steamFriendInfo = System.Text.Json.JsonSerializer.Deserialize<SteamFriendInfo>(steamFriendsStatusJson);
+            if (steamFriendInfo?.response?.players == null)
+            {
+                _logger.LogError("Deserialized SteamFriendInfo object or its components are null");
+                throw new InvalidOperationException("Deserialized SteamFriendInfo object or its components are null");
+            }
             return steamFriendInfo.response.players;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while getting the friend summaries");
+            throw;
         }
     }
 }

@@ -124,7 +124,7 @@
 }
 
 $(document).ready(function () {
-    var steamId = '@Model.User_metadata.SteamId';
+    var steamId = '@Model?.User_metadata?.SteamId';
     if (steamId) { // checks if steamId is not null and not an empty string
         $('#loading').show();
         $.ajax({

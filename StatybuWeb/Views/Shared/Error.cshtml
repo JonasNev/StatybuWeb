@@ -1,23 +1,12 @@
 ﻿<link rel="stylesheet" href="~/css/error.css" />
-<div>
-    <span class='error-num'>5</span>
-    <div class='eye'></div>
-    <div class='eye'></div>
-    <p class='sub-text'>Oh eyeballs! Something went wrong. We're <i>looking</i> to see what happened.</p>
-    <a onclick="history.back()">Go back</a>
+<div class="wrapper">
+    <div class="box">
+        <p>Sorry, it's me, not you.</p>
+        <p>&#58;&#40;</p>
+        @if (!string.IsNullOrEmpty(ViewData["ErrorMessage"] as string))
+        {
+            <p class='sub-text'>Error message: @ViewData["ErrorMessage"]</p>
+        }
+        <p><a href="javascript:history.back()">Go Back</a></p>
+    </div>
 </div>
-
-<script>
-    $('body').mousemove(function (event) {
-        var e = $('.eye');
-        var x = (e.offset().left) + (e.width() / 2);
-        var y = (e.offset().top) + (e.height() / 2);
-        var rad = Math.atan2(event.pageX - x, event.pageY - y);
-        var rot = (rad * (180 / Math.PI) * -1) + 180;
-        e.css({
-            '-webkit-transform': 'rotate(' + rot + 'deg)',
-            'transform': 'rotate(' + rot + 'deg)'
-        });
-    });
-
-</script>

@@ -1,42 +1,49 @@
-﻿using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
+﻿using Azure.Security.KeyVault.Secrets;
+using Azure.Identity;
+using Microsoft.Extensions.Logging;
+using StatybuWeb.Constants;
+using System.Collections.Concurrent;
+using Microsoft.VisualBasic;
+using StatybuWeb.Services.Api;
 
-namespace StatybuWeb.Services.Api
+public class AzureKeyVaultService : IAzureKeyVaultService
 {
-    public class AzureKeyVaultService : IAzureKeyVaultService
+    private static readonly ConcurrentDictionary<string, string> SecretCache = new ConcurrentDictionary<string, string>();
+    private readonly SecretClient _keyVaultClient;
+    private readonly ILogger<AzureKeyVaultService> _logger;
+
+    public AzureKeyVaultService(ILogger<AzureKeyVaultService> logger)
     {
-        private static readonly Dictionary<string, string> SecretCache = new Dictionary<string, string>();
-        private static readonly object CacheLock = new object();
-        private readonly SecretClient _keyVaultClient;
+        var credential = new DefaultAzureCredential();
+        _keyVaultClient = new SecretClient(new Uri(AzureConstants.KeyVaultUrl), credential);
+        _logger = logger;
+    }
 
-        public AzureKeyVaultService()
+    public async Task<string> GetSecretFromKeyVault(string secretName)
+    {
+        if (string.IsNullOrEmpty(secretName))
         {
-            var credential = new DefaultAzureCredential();
-            _keyVaultClient = new SecretClient(new Uri(Constants.AzureConstants.KeyVaultUrl), credential);
+            _logger.LogError("Secret name is null or empty");
+            throw new ArgumentNullException(nameof(secretName));
         }
 
-        public async Task<string> GetSecretFromKeyVault(string secretName)
+        if (SecretCache.TryGetValue(secretName, out var cachedSecret))
         {
-            // Check if the secret exists in the cache
-            if (SecretCache.TryGetValue(secretName, out var cachedSecret))
-            {
-                return cachedSecret;
-            }
-
-            // Retrieve the secret from Key Vault outside the lock
-            KeyVaultSecret secret = await _keyVaultClient.GetSecretAsync(secretName);
-
-            lock (CacheLock)
-            {
-                // Double-check within the lock to prevent multiple threads from simultaneously updating the cache
-                if (!SecretCache.ContainsKey(secretName))
-                {
-                    // Cache the retrieved secret
-                    SecretCache[secretName] = secret.Value;
-                }
-            }
-
-            return secret.Value;
+            _logger.LogInformation($"Retrieved secret {secretName} from cache");
+            return cachedSecret;
         }
+
+        KeyVaultSecret secret = await _keyVaultClient.GetSecretAsync(secretName);
+
+        if (secret == null)
+        {
+            _logger.LogError($"Failed to retrieve secret {secretName} from Key Vault");
+            throw new Exception($"Secret {secretName} not found in Key Vault");
+        }
+
+        SecretCache[secretName] = secret.Value;
+
+        _logger.LogInformation($"Retrieved secret {secretName} from Key Vault and cached it");
+        return secret.Value;
     }
 }

@@ -11,10 +11,10 @@
         }
 
         public static readonly IEnumerable<string> ImageExtensions = new List<string>()
-            {
-                new string(FileExtensions.Png),
-                new string(FileExtensions.Jpg),
-                new string(FileExtensions.Jpeg)
-            };
+        {
+            new string(FileExtensions.Png),
+            new string(FileExtensions.Jpg),
+            new string(FileExtensions.Jpeg)
+        };
     }
 }

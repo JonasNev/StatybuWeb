@@ -26,7 +26,17 @@ namespace StatybuWeb.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            if (HttpContext.Items["Exception"] is Exception ex)
+
+            {
+                ViewData["ErrorMessage"] = ex.Message;
+            }
+            else
+            {
+                ViewData["ErrorMessage"] = "An error occurred while processing your request. Please try again later.";
+            }
+
+            return View();
         }
     }
 }

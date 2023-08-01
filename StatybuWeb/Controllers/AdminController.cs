@@ -5,6 +5,7 @@ using StatybuWeb.Services.Api;
 using System.Security.Claims;
 using StatybuWeb.Dto;
 using StatybuWeb.Services.Auth0;
+using StatybuWeb.Constants;
 
 namespace StatybuWeb.Controllers
 {
@@ -26,11 +27,14 @@ namespace StatybuWeb.Controllers
         private bool IsUserAuthorized(string role)
         {
             string? userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
             if (userId == null)
             {
                 return false;
             }
+
             var userRoles = _auth0Service.GetUserRoles(userId).Result.Select(x => x.Name);
+
             return userRoles.Contains(role);
         }
 
@@ -44,24 +48,28 @@ namespace StatybuWeb.Controllers
         [HttpPost]
         public async Task<ActionResult> UploadImage(IFormFile file)
         {
-            if (IsUserAuthorized("Admin"))
+            if (!IsUserAuthorized(Auth0Constants.Roles.Admin))
             {
-                if (file != null && file.Length > 0)
-                {
-                    await _azureBlobStorageService.UploadFileToBlobStorage(file);
-                }
-                return RedirectToAction("Index");
+                return View("Unauthorized");
             }
-            return View("Unauthorized");
+            
+            if (file != null && file.Length > 0)
+            {
+                await _azureBlobStorageService.UploadFileToBlobStorage(file);
+            }
+
+            return RedirectToAction("Index");
+
         }
 
         [Authorize(AuthenticationSchemes = "Auth0")]
         public async Task<ActionResult> ImageActions()
         {
-            if (IsUserAuthorized("Admin"))
+            if (IsUserAuthorized(Auth0Constants.Roles.Admin))
             {
                 return View(await _azureBlobStorageService.GetImagesFilesFromBlobStorage());
             }
+
             return View("Unauthorized");
         }
 
@@ -69,32 +77,33 @@ namespace StatybuWeb.Controllers
         [HttpPost]
         public async Task<ActionResult> DeleteImages(List<Picture> fileNames)
         {
-            if (IsUserAuthorized("Admin"))
+            if (!IsUserAuthorized(Auth0Constants.Roles.Admin))
             {
-                BlobContainerClient containerClient = await _azureBlobStorageService.GetAzureBlobContainerClientFromSecrets();
-                foreach (var picture in fileNames)
+                return View("Unauthorized");
+            }
+
+            BlobContainerClient containerClient = await _azureBlobStorageService.GetAzureBlobContainerClientFromSecrets();
+            foreach (var picture in fileNames)
+            {
+                if (picture.Selected)
                 {
-                    if (picture.Selected)
+                    try
                     {
-                        try
-                        {
-                            // Get a reference to the file
-                            BlobClient blobClient = containerClient.GetBlobClient(picture.Name);
+                        BlobClient blobClient = containerClient.GetBlobClient(picture.Name);
 
-                            // Delete the file
-                            await blobClient.DeleteAsync();
+                        await blobClient.DeleteAsync();
 
-                            _logger.LogInformation($"Success deleting file': {picture.Name}");
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError($"Error deleting file': {ex.Message}");
-                        }
+                        _logger.LogInformation($"Success deleting file': {picture.Name}");
+                    }
+
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"Error deleting file': {ex.Message}");
                     }
                 }
-                return RedirectToAction("Index");
             }
-            return View("Unauthorized");
+
+            return RedirectToAction("Index");
         }
     }
 }

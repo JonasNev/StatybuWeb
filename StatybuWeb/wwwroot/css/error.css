@@ -1,40 +1,70 @@
-﻿body
-background-color: rgb(51, 51, 51)
-width: 100vw
-height: 100vh
-color: white
-font-family: 'Arial Black'
-text-align: center
-display: flex
-justify-content: center
-align-items: center
+﻿html {
+    box-sizing: border-box;
+}
 
-.error-num
-font-size: 8em
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+}
 
-.eye
-background: #fff
-border-radius: 50%
-display: inline-block
-height: 100px
-position: relative
-width: 100px
-&::after
-background: #000
-border-radius: 50%
-bottom: 56.1px
-content: ''
-height: 33px
-position: absolute
-right: 33px
-width: 33px
+body * {
+    margin: 0;
+    padding: 0;
+}
 
-p
-margin-bottom: 4em
+body {
+    background-color: #7ed0f2;
+    color: #fff;
+}
 
-a
-color: white
-text-decoration: none
-text-transform: uppercase
-&:hover
-color: lightgray
+.wrapper {
+    position: relative;
+    max-width: 1298px;
+    height: auto;
+    margin: 2em auto 0 auto;
+}
+
+/* https://www.flaticon.com/authors/vectors-market */
+/* https://www.flaticon.com/authors/icomoon */
+.box {
+    max-width: 70%;
+    min-height: auto;
+    margin: 0 auto;
+    padding: 1em 1em;
+    text-align: center;
+    background: url("https://www.dropbox.com/s/xq0841cp3icnuqd/flame.png?raw=1") no-repeat top 10em center/128px 128px, transparent url("https://www.dropbox.com/s/w7qqrcvhlx3pwnf/desktop-pc.png?raw=1") no-repeat top 13em center/128px 128px;
+}
+
+h1, p:not(:last-of-type) {
+    text-shadow: 0 0 6px #216f79;
+}
+
+h1 {
+    margin: 0 0 1rem 0;
+    font-size: 8em;
+}
+
+p {
+    margin-bottom: 0.5em;
+    font-size: 3em;
+}
+
+    p:first-of-type {
+        margin-top: 4em;
+    }
+
+    p > a {
+        border-bottom: 1px dashed #216f79;
+        font-style: italic;
+        text-decoration: none;
+        color: #216f79;
+    }
+
+        p > a:hover {
+            text-shadow: 0 0 6px #216f79;
+        }
+
+    p img {
+        vertical-align: bottom;
+    }

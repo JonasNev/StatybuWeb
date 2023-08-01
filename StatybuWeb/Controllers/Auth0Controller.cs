@@ -112,12 +112,16 @@ namespace StatybuWeb.Controllers
             }
 
             string? userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
             if (userId == null)
             {
                 return View("Error");
             }
+
             var currentUserData = _auth0Service.GetUser(userId).Result;
+
             _auth0Service.UpdateUser(userId, user, currentUserData);
+
             return RedirectToAction("Profile", user);
         }
     }

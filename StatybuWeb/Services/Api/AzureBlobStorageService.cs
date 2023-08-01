@@ -1,7 +1,4 @@
-﻿using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
-using Azure.Storage.Blobs;
-using Microsoft.Extensions.Logging;
+﻿using Azure.Storage.Blobs;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using StatybuWeb.Dto;
 
@@ -19,29 +16,47 @@ namespace StatybuWeb.Services.Api
         {
             _logger = logger;
             _azureKeyVaultService = azureKeyVaultService;
-            // Fetch the secrets at the start of the application
             _connectionString = _azureKeyVaultService.GetSecretFromKeyVault(Constants.AzureConstants.KeyVaultSecretNames.ConnectionString).GetAwaiter().GetResult();
             _blobContainer = _azureKeyVaultService.GetSecretFromKeyVault(Constants.AzureConstants.KeyVaultSecretNames.BlobContainer).GetAwaiter().GetResult();
         }
 
         public async Task<List<Picture>> GetImagesFilesFromBlobStorage()
         {
-            BlobContainerClient containerClient = new BlobContainerClient(_connectionString, _blobContainer);
-
-            List<Picture> pictures = new List<Picture>();
-
-            await foreach (var blobItem in containerClient.GetBlobsAsync())
+            try
             {
-                BlobClient blobClient = containerClient.GetBlobClient(blobItem.Name);
-                pictures.Add(new Picture()
-                {
-                    Uri = blobClient.Uri,
-                    Name = blobItem.Name,
-                    Extension = Path.GetExtension(blobItem.Name)
-                });
-            }
+                BlobContainerClient containerClient = await GetAzureBlobContainerClientFromSecrets();
 
-            return pictures;
+                List<Picture> pictures = new List<Picture>();
+
+                await foreach (var blobItem in containerClient.GetBlobsAsync())
+                {
+                    if (blobItem != null)
+                    {
+                        BlobClient blobClient = containerClient.GetBlobClient(blobItem.Name);
+                        if (blobClient != null)
+                        {
+                            pictures.Add(new Picture()
+                            {
+                                Uri = blobClient.Uri,
+                                Name = blobItem.Name,
+                                Extension = Path.GetExtension(blobItem.Name)
+                            });
+                        }
+                        else
+                        {
+                            _logger.LogWarning($"Failed to get BlobClient for blobItem: {blobItem.Name}");
+                        }
+                    }
+                }
+
+                _logger.LogInformation($"Retrieved {pictures.Count} pictures from blob storage");
+                return pictures;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while getting image files from Azure Blob storage");
+                throw new InvalidOperationException("An error occurred while getting image files from Azure Blob storage", ex);
+            }
         }
 
         public async Task UploadFileToBlobStorage(IFormFile file)
@@ -50,21 +65,18 @@ namespace StatybuWeb.Services.Api
             {
                 if (file != null)
                 {
+
                     BlobContainerClient containerClient = await GetAzureBlobContainerClientFromSecrets();
 
-                    // Read the file as a stream
                     using (var stream = file.OpenReadStream())
                     {
-                        // Create a unique name for the picture
                         string uniqueName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
 
                         // Compress the image before uploading
                         using (var compressedStream = await CompressImageAsync(stream))
                         {
-                            // Get a reference to a blob within the container
                             BlobClient blobClient = containerClient.GetBlobClient(uniqueName);
 
-                            // Upload the file to Azure Blob storage
                             await blobClient.UploadAsync(compressedStream, overwrite: true);
                         }
                     }
@@ -76,13 +88,13 @@ namespace StatybuWeb.Services.Api
             catch (Exception ex)
             {
                 _logger.LogError($"Error uploading file to Azure Blob storage: {ex.Message}");
-                throw; // Rethrow the exception for the calling code to handle
+                throw new InvalidOperationException("Error uploading file to Azure Blob storage", ex);
             }
         }
 
         private async Task<Stream> CompressImageAsync(Stream imageStream)
         {
-            using (var image = SixLabors.ImageSharp.Image.Load(imageStream))
+            using (var image = Image.Load(imageStream))
             {
                 // Apply compression settings to reduce the size of the image
                 image.Mutate(x => x.Resize(new ResizeOptions
@@ -91,10 +103,8 @@ namespace StatybuWeb.Services.Api
                     Mode = ResizeMode.Max // Choose the appropriate resize mode
                 }));
 
-                // Create a new memory stream to store the compressed image
                 var compressedStream = new MemoryStream();
 
-                // Save the compressed image to the stream
                 await image.SaveAsync(compressedStream, new JpegEncoder()); // Choose the appropriate encoder based on the desired output format (e.g., Jpeg, Png, etc.)
 
                 // Rewind the stream to the beginning before returning it
@@ -108,21 +118,18 @@ namespace StatybuWeb.Services.Api
         {
             try
             {
-                // Get a reference to the container
                 BlobContainerClient containerClient = await GetAzureBlobContainerClientFromSecrets();
 
-                // Get a reference to the blob based on the given GUID
                 BlobClient blobClient = containerClient.GetBlobClient(guid);
 
-                // Check if the blob exists
                 if (!await blobClient.ExistsAsync())
                 {
                     _logger.LogInformation($"Blob with GUID '{guid}' does not exist in Azure Blob storage.");
                     return null;
                 }
 
-                // Get the URL of the blob
                 string blobUrl = blobClient.Uri.ToString();
+
                 return new Picture()
                 {
                     Uri = blobClient.Uri,
@@ -132,7 +139,7 @@ namespace StatybuWeb.Services.Api
             catch (Exception ex)
             {
                 _logger.LogError($"Error retrieving file URL from Azure Blob storage: {ex.Message}");
-                throw; // Rethrow the exception for the calling code to handle
+                throw new InvalidOperationException("Error retrieving file URL from Azure Blob storage", ex);
             }
         }
 
@@ -140,7 +147,15 @@ namespace StatybuWeb.Services.Api
         {
             BlobServiceClient blobServiceClient = new BlobServiceClient(_connectionString);
 
-            return await Task.FromResult(blobServiceClient.GetBlobContainerClient(_blobContainer));
+            var blobContainer = await Task.FromResult(blobServiceClient.GetBlobContainerClient(_blobContainer));
+
+            if (blobContainer == null)
+            {
+                _logger.LogError("BlobContainerClient is null");
+                throw new ArgumentNullException($"Blob container {nameof(_blobContainer)} is null, check connection string or blobcontainer name in azure secrets.");
+            }
+
+            return blobContainer;
         }
     }
 }

@@ -18,10 +18,10 @@ builder.Services.AddResponseCompression(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddTransient<IAzureBlobStorageService, AzureBlobStorageService>();
-builder.Services.AddTransient<IAzureKeyVaultService, AzureKeyVaultService>();
-builder.Services.AddTransient<IAuth0Service,Auth0Service>();
-builder.Services.AddTransient<ISteamService, SteamService>();
+builder.Services.AddSingleton<IAzureBlobStorageService, AzureBlobStorageService>();
+builder.Services.AddSingleton<IAzureKeyVaultService, AzureKeyVaultService>();
+builder.Services.AddHttpClient<IAuth0Service,Auth0Service>();
+builder.Services.AddHttpClient<ISteamService, SteamService>();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -32,10 +32,9 @@ builder.Services.AddAuthentication(options =>
     options.Audience = StatybuWeb.Constants.AzureConstants.KeyVaultUrl;
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        RoleClaimType = $"{options.Authority}/roles",// Replace with your actual claim type
+        RoleClaimType = $"{options.Authority}/roles",
     };
 });
-
 
 // Fetch secrets from Key Vault
 var auth0DomainSecret = secretClient.GetSecretAsync(StatybuWeb.Constants.AzureConstants.KeyVaultSecretNames.Auth0Domain).Result.Value;
@@ -49,14 +48,14 @@ builder.Services.AddAuth0WebAppAuthentication(options =>
 
 var app = builder.Build();
 app.UseResponseCompression();
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    app.UseMiddleware<ErrorHandlingMiddleware>(); 
 }
 
+app.UseExceptionHandler("/Home/Error");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

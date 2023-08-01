@@ -1,5 +1,4 @@
-﻿using Azure.Storage.Blobs;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using StatybuWeb.Constants;
 using StatybuWeb.Dto;
@@ -17,10 +16,12 @@ namespace StatybuWeb.Services.Auth0
         private readonly string _auth0ManagementToken;
         private readonly ILogger<Auth0Service> _logger;
 
-        public Auth0Service(IAzureKeyVaultService azureKeyVaultService, ILogger<Auth0Service> logger)
+        public Auth0Service(IAzureKeyVaultService azureKeyVaultService,
+            ILogger<Auth0Service> logger,
+            HttpClient httpClient)
         {
             _azureKeyVaultService = azureKeyVaultService;
-            _httpClient = new HttpClient();
+            _httpClient = httpClient;
             _httpClient.BaseAddress = new Uri(_azureKeyVaultService.GetSecretFromKeyVault(AzureConstants.KeyVaultSecretNames.BaseAuth0Address).GetAwaiter().GetResult());
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -37,7 +38,7 @@ namespace StatybuWeb.Services.Auth0
             catch (Exception ex)
             {
                 _logger.LogError($"Error occurred while initializing Auth0 management token: {ex.Message}");
-                throw;
+                throw new SystemException("Error occurred while initializing Auth0 management token", ex);
             }
         }
 
@@ -48,7 +49,6 @@ namespace StatybuWeb.Services.Auth0
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _auth0ManagementToken);
 
-                // Call Auth0 Management API to get user roles
                 var response = await _httpClient.GetAsync($"api/v2/users/{userId}/roles");
                 response.EnsureSuccessStatusCode();
 
@@ -66,7 +66,7 @@ namespace StatybuWeb.Services.Auth0
         public async Task<User> GetUser(string userId)
         {
             var user = new User();
-            try
+            try 
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _auth0ManagementToken);
 
@@ -79,7 +79,7 @@ namespace StatybuWeb.Services.Auth0
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error occurred while retrieving user roles: {ex.Message}");
+                _logger.LogError($"Error occurred while retrieving user: {ex.Message}");
             }
 
             return user;
@@ -107,13 +107,12 @@ namespace StatybuWeb.Services.Auth0
                 {
                     var errorMessage = await response.Content.ReadAsStringAsync();
                     _logger.LogError($"Error occurred while updating user data: {response.StatusCode} - {errorMessage}");
-                    // Additional error handling or logging can be performed here
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error occurred while updating user data: {ex.Message}");
-                // Additional error handling or logging can be performed here
+                throw new InvalidOperationException("Error occurred while updating user data", ex);
             }
         }
 
